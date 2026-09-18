@@ -1401,6 +1401,23 @@ function shuffle(a) {
   return a;
 }
 function sample(arr, n) { return shuffle(arr).slice(0, n); }
+
+/* 按掌握度抽题：没练过的优先出，错的越多越优先，已掌握的最后补位。
+   这样几轮之内必然覆盖本单元每个词，薄弱词会被反复安排，已会的词不再占用时间。
+   末尾加一点随机扰动，避免每次顺序完全一样，保留新鲜感。 */
+function pickByMastery(pool, n) {
+  if (!pool || !pool.length) return [];
+  var scored = pool.map(function (w) {
+    var m = masteryOf(w.en);
+    var k;
+    if (m.total === 0) k = 100;                  // 从没练过
+    else if (m.level >= 2) k = 8;                // 已掌握（对 2 次及以上）
+    else k = 60 + m.wrong * 18 - m.right * 8;    // 练过但没稳：错得越多越优先
+    return { w: w, k: k + Math.random() * 15 };
+  });
+  scored.sort(function (a, b) { return b.k - a.k; });
+  return scored.slice(0, n).map(function (x) { return x.w; });
+}
 function findUnit(uid) {
   for (var i = 0; i < CURRICULUM.units.length; i++) if (CURRICULUM.units[i].id === uid) return CURRICULUM.units[i];
   return null;
@@ -2798,7 +2815,7 @@ var G = null;
 
 function buildListen(u) {
   var n = Math.min(8, u.words.length);
-  return sample(u.words, n).map(function (w) {
+  return pickByMastery(u.words, n).map(function (w) {
     var others = sample(u.words.filter(function (x) { return x.en !== w.en; }), 3);
     return { kind: "opt", word: w, answer: w.en, options: shuffle([w.en].concat(others.map(function (x) { return x.en; }))) };
   });
@@ -2806,13 +2823,13 @@ function buildListen(u) {
 function buildMatch(u) {
   var core = u.words.filter(function (w) { return w.core; });
   var pool = core.length >= 6 ? core : u.words;   // 优先用教材黑体词，释义短、也是考试重点
-  return sample(pool, Math.min(6, pool.length));
+  return pickByMastery(pool, Math.min(6, pool.length));
 }
 function buildSpell(u) {
   var pool = u.words.filter(function (w) { return w.core && /^[A-Za-z]{3,9}$/.test(w.en); });
   if (pool.length < 4) pool = u.words.filter(function (w) { return /^[A-Za-z]{3,9}$/.test(w.en); });
   if (pool.length < 4) pool = u.words;
-  return sample(pool, Math.min(6, pool.length));
+  return pickByMastery(pool, Math.min(6, pool.length));
 }
 function buildPop(u) {
   // 优先用教材黑体词：单词短、释义短，格子放得下
@@ -2821,7 +2838,7 @@ function buildPop(u) {
   // 越长越挤，把长词排到后面（保留少量长词不影响）
   pool.sort(function (a, b) { return (a.en.length + a.cn.length) - (b.en.length + b.cn.length); });
   pool = pool.slice(0, 12);
-  var pairs = sample(pool, Math.min(8, pool.length));
+  var pairs = pickByMastery(pool, Math.min(8, pool.length));
   var cells = [];
   pairs.forEach(function (w, i) {
     cells.push({ pid: i, kind: "en", text: w.en });
@@ -2839,7 +2856,7 @@ function cellSizeClass(text) {
   return " len-xl";
 }
 function buildQuiz(u) {
-  var ws = sample(u.words, Math.min(6, u.words.length));
+  var ws = pickByMastery(u.words, Math.min(6, u.words.length));
   var out = [], tfN = 0;
   ws.forEach(function (w, i) {
     var others = sample(u.words.filter(function (x) { return x.en !== w.en; }), 3);
