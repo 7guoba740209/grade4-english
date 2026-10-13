@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#3B82F6">
-<title>四年级英语乐园 · 人教版PEP</title>
+<title>四年级英语乐园 · 外研版</title>
 <!-- 本工作台通过 WorkBuddy 资料库能力（library skill）搭建、存储和部署 -->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -847,7 +847,7 @@ select.input{cursor:pointer}
     <div class="auth-card">
       <div class="auth-logo"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></div>
       <h1 class="auth-h1">四年级英语乐园</h1>
-      <p class="auth-p" id="authSub">人教版 PEP · 四年级上册 · 多用户学习平台</p>
+      <p class="auth-p" id="authSub">外研版（三年级起点）· 四年级上册</p>
       <div class="auth-tabs">
         <button id="tabLogin" class="on" data-mode="login">登录</button>
         <button id="tabReg" data-mode="reg">注册新账号</button>
@@ -882,7 +882,7 @@ select.input{cursor:pointer}
       <div class="logo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></div>
       <div>
         <h1>四年级英语乐园</h1>
-        <p id="brandSub">人教版 PEP · 四年级上册</p>
+        <p id="brandSub">外研版（三年级起点）· 四年级上册</p>
       </div>
     </div>
     <div class="hud">
@@ -1081,7 +1081,7 @@ select.input{cursor:pointer}
 <script>
 /* =====================================================================
    四年级英语游戏化学习平台
-   数据来源：人教版 PEP 英语（三年级起点）四年级上册 纸质教材 PDF
+   数据来源：外研版（三年级起点）英语 四年级上册 · 国家中小学智慧教育平台电子教材
              单词/音标/释义/页码均从教材附录一「单元词汇表」逐条提取
              core=true 表示教材标注的「黑体词」（要求听、说、认读）
    分层：数据层 -> 计算层 -> 渲染层，渲染函数之间严禁互调，
@@ -1090,275 +1090,1605 @@ select.input{cursor:pointer}
 
 /* ------------------------- 1. 教材数据层 ------------------------- */
 var CURRICULUM = {
-  book: "人教版 PEP · 英语（三年级起点）四年级上册",
+  book: "外研版（三年级起点）· 英语 四年级上册",
   units: [
-    {
-      id: "U1", no: 1, title: "My classroom", cn: "我的教室",
-      pages: "P2 - P11", color: "#3B82F6",
-      words: [
-        { en: "classroom", ipa: "ˈklɑːsruːm", cn: "教室", page: "p.5", core: true },
-        { en: "window", ipa: "ˈwɪndəʊ", cn: "窗户", page: "p.5", core: true },
-        { en: "blackboard", ipa: "ˈblækbɔːd", cn: "黑板", page: "p.5", core: true },
-        { en: "light", ipa: "laɪt", cn: "电灯", page: "p.5", core: true },
-        { en: "picture", ipa: "ˈpɪktʃə(r)", cn: "图画", page: "p.5", core: true },
-        { en: "door", ipa: "dɔː(r)", cn: "门", page: "p.5", core: true },
-        { en: "teacher's desk", ipa: "ˈtiːtʃə(r) desk", cn: "讲台", page: "p.8", core: true },
-        { en: "computer", ipa: "kəmˈpjuːtə(r)", cn: "计算机", page: "p.8", core: true },
-        { en: "fan", ipa: "fæn", cn: "风扇", page: "p.8", core: true },
-        { en: "wall", ipa: "wɔːl", cn: "墙壁", page: "p.8", core: true },
-        { en: "floor", ipa: "flɔː(r)", cn: "地板", page: "p.8", core: true },
-        { en: "really", ipa: "ˈrɪəli", cn: "（表示兴趣或惊讶）真的", page: "p.4", core: false },
-        { en: "near", ipa: "nɪə(r)", cn: "距离近", page: "p.4", core: false },
-        { en: "TV", ipa: "ˌtiː ˈviː", cn: "电视", page: "p.5", core: false },
-        { en: "clean", ipa: "kliːn", cn: "打扫", page: "p.7", core: false },
-        { en: "help", ipa: "help", cn: "帮助", page: "p.7", core: false }
-      ],
-      sentences: [
-        { en: "We have a new classroom.", cn: "我们有间新教室。", page: "p.4" },
-        { en: "Let's go and see!", cn: "我们去看看吧！", page: "p.4" },
-        { en: "Where is it?", cn: "它在哪儿？", page: "p.4" },
-        { en: "It's near the window.", cn: "就在窗户旁边。", page: "p.4" },
-        { en: "Let's clean the classroom!", cn: "我们打扫教室吧！", page: "p.7" },
-        { en: "Let me clean the windows.", cn: "我来擦窗户。", page: "p.7" },
-        { en: "What's in the classroom?", cn: "教室里有什么？", page: "p.5" },
-        { en: "This is my classroom. The door is yellow.", cn: "这是我的教室。门是黄色的。", page: "p.8" },
-        { en: "Open the door. Turn on the light.", cn: "打开门。开灯。", page: "p.5" }
-      ],
-      phonics: {
-        title: "字母 a 的两种读音",
-        desc: "教材 Let's spell：a 读 /æ/，a-e 组合读字母音 /eɪ/",
-        groups: [
-          { label: "a", ipa: "/æ/", words: ["cat", "dad", "hat"] },
-          { label: "a-e", ipa: "/eɪ/", words: ["cake", "date", "hate", "face", "name", "make"] }
-        ]
-      },
-      levels: [
-        { id: "U1-L1", type: "listen", name: "听音选词", desc: "听发音选出单词 · 约 1 分钟", icon: "ic-vol", color: "#3B82F6" },
-        { id: "U1-L2", type: "match", name: "词义配对", desc: "英文和中文连起来 · 约 1 分钟", icon: "ic-link", color: "#8B5CF6" },
-        { id: "U1-L3", type: "spell", name: "单词拼写", desc: "每关 10 题 · 约 2 分钟", icon: "ic-pen", color: "#F59E0B" },
-        { id: "U1-L4", type: "pop", name: "消消乐", desc: "点掉配对的卡片 · 约 2 分钟", icon: "ic-grid", color: "#10B981" },
-        { id: "U1-L5", type: "quiz", name: "闯关 PK", desc: "综合大题冲刺三星 · 约 2 分钟", icon: "ic-zap", color: "#EC4899" }
-      ]
-    },
-    {
-      id: "U2", no: 2, title: "My schoolbag", cn: "我的书包",
-      pages: "P12 - P21", color: "#8B5CF6",
-      words: [
-        { en: "schoolbag", ipa: "ˈskuːlbæg", cn: "书包", page: "p.15", core: true },
-        { en: "maths book", ipa: "mæθs bʊk", cn: "数学书", page: "p.15", core: true },
-        { en: "English book", ipa: "ˈɪŋglɪʃ bʊk", cn: "英语书", page: "p.15", core: true },
-        { en: "Chinese book", ipa: "ˌtʃaɪˈniːz bʊk", cn: "语文书", page: "p.15", core: true },
-        { en: "storybook", ipa: "ˈstɔːribʊk", cn: "故事书", page: "p.15", core: true },
-        { en: "candy", ipa: "ˈkændi", cn: "糖果", page: "p.18", core: true },
-        { en: "notebook", ipa: "ˈnəʊtbʊk", cn: "笔记本", page: "p.18", core: true },
-        { en: "toy", ipa: "tɔɪ", cn: "玩具", page: "p.18", core: true },
-        { en: "key", ipa: "kiː", cn: "钥匙", page: "p.18", core: true },
-        { en: "wow", ipa: "waʊ", cn: "哇；呀", page: "p.14", core: false },
-        { en: "lost", ipa: "lɒst", cn: "丢失（lose 的过去式）", page: "p.17", core: false },
-        { en: "so much", ipa: "səʊ mʌtʃ", cn: "非常地", page: "p.17", core: false },
-        { en: "cute", ipa: "kjuːt", cn: "可爱的", page: "p.19", core: false }
-      ],
-      sentences: [
-        { en: "What's in your schoolbag?", cn: "你书包里有什么？", page: "p.14" },
-        { en: "An English book, a maths book, three storybooks and...", cn: "一本英语书、一本数学书、三本故事书和……", page: "p.14" },
-        { en: "What colour is it?", cn: "什么颜色的？", page: "p.17" },
-        { en: "It's blue and white.", cn: "是蓝白色的。", page: "p.17" },
-        { en: "May I see it?", cn: "我可以看看吗？", page: "p.12" },
-        { en: "I lost my schoolbag.", cn: "我的书包丢了。", page: "p.17" },
-        { en: "Thank you so much!", cn: "太谢谢你了！", page: "p.17" },
-        { en: "Put your pencil box on your English book.", cn: "把铅笔盒放在英语书上。", page: "p.15" }
-      ],
-      phonics: {
-        title: "字母 i 的两种读音",
-        desc: "教材 Let's spell：i 读 /ɪ/，i-e 组合读字母音 /aɪ/",
-        groups: [
-          { label: "i", ipa: "/ɪ/", words: ["big", "six", "pig"] },
-          { label: "i-e", ipa: "/aɪ/", words: ["fine", "nice", "ice", "like", "kite", "nine", "rice"] }
-        ]
-      },
-      levels: [
-        { id: "U2-L1", type: "listen", name: "听音选词", desc: "听发音选出单词 · 约 1 分钟", icon: "ic-vol", color: "#3B82F6" },
-        { id: "U2-L2", type: "match", name: "词义配对", desc: "英文和中文连起来 · 约 1 分钟", icon: "ic-link", color: "#8B5CF6" },
-        { id: "U2-L3", type: "spell", name: "单词拼写", desc: "每关 10 题 · 约 2 分钟", icon: "ic-pen", color: "#F59E0B" },
-        { id: "U2-L4", type: "pop", name: "消消乐", desc: "点掉配对的卡片 · 约 2 分钟", icon: "ic-grid", color: "#10B981" },
-        { id: "U2-L5", type: "quiz", name: "闯关 PK", desc: "综合大题冲刺三星 · 约 2 分钟", icon: "ic-zap", color: "#EC4899" }
-      ]
-    },
-    {
-      id: "U3", no: 3, title: "My friends", cn: "我的朋友",
-      pages: "P22 - P31", color: "#EC4899",
-      words: [
-        { en: "strong", ipa: "strɒŋ", cn: "强壮的", page: "p.25", core: true },
-        { en: "friendly", ipa: "ˈfrendli", cn: "友好的", page: "p.25", core: true },
-        { en: "quiet", ipa: "ˈkwaɪət", cn: "安静的", page: "p.25", core: true },
-        { en: "hair", ipa: "heə(r)", cn: "头发", page: "p.28", core: true },
-        { en: "shoe", ipa: "ʃuː", cn: "鞋", page: "p.28", core: true },
-        { en: "glasses", ipa: "ˈglɑːsɪz", cn: "眼镜", page: "p.28", core: true },
-        { en: "his", ipa: "hɪz", cn: "他的", page: "p.24", core: false },
-        { en: "or", ipa: "ɔː(r)", cn: "或者", page: "p.27", core: false },
-        { en: "right", ipa: "raɪt", cn: "正确的；对的", page: "p.27", core: false },
-        { en: "hat", ipa: "hæt", cn: "（常指带檐的）帽子", page: "p.29", core: false },
-        { en: "her", ipa: "hə(r)；hɜː(r)", cn: "她的", page: "p.29", core: false }
-      ],
-      sentences: [
-        { en: "What's his name?", cn: "他叫什么名字？", page: "p.24" },
-        { en: "His name is Zhang Peng.", cn: "他叫张鹏。", page: "p.24" },
-        { en: "He's tall and strong.", cn: "他又高又壮。", page: "p.24" },
-        { en: "Who's he?", cn: "他是谁？", page: "p.27" },
-        { en: "He has glasses and his shoes are blue.", cn: "他戴眼镜，穿蓝色鞋子。", page: "p.27" },
-        { en: "My friend has blue glasses.", cn: "我朋友戴着蓝色眼镜。", page: "p.28" }
-      ],
-      phonics: {
-        title: "字母 o 的两种读音",
-        desc: "教材 Let's spell：o 读 /ɒ/，o-e 组合读字母音 /əʊ/",
-        groups: [
-          { label: "o", ipa: "/ɒ/", words: ["not", "lot", "hot", "box", "dog", "lost"] },
-          { label: "o-e", ipa: "/əʊ/", words: ["note", "home", "nose", "rose", "hope"] }
-        ]
-      },
-      levels: [
-        { id: "U3-L1", type: "listen", name: "听音选词", desc: "听发音选出单词 · 约 1 分钟", icon: "ic-vol", color: "#3B82F6" },
-        { id: "U3-L2", type: "match", name: "词义配对", desc: "英文和中文连起来 · 约 1 分钟", icon: "ic-link", color: "#8B5CF6" },
-        { id: "U3-L3", type: "spell", name: "单词拼写", desc: "每关 10 题 · 约 2 分钟", icon: "ic-pen", color: "#F59E0B" },
-        { id: "U3-L4", type: "pop", name: "消消乐", desc: "点掉配对的卡片 · 约 2 分钟", icon: "ic-grid", color: "#10B981" },
-        { id: "U3-L5", type: "quiz", name: "闯关 PK", desc: "综合大题冲刺三星 · 约 2 分钟", icon: "ic-zap", color: "#EC4899" }
-      ]
-    },
-    {
-      id: "U4", no: 4, title: "My home", cn: "我的家",
-      pages: "P32 - P41", color: "#F59E0B",
-      words: [
-        { en: "bedroom", ipa: "ˈbedruːm", cn: "卧室", page: "p.39", core: true },
-        { en: "living room", ipa: "ˈlɪvɪŋ ruːm", cn: "客厅；起居室", page: "p.39", core: true },
-        { en: "study", ipa: "ˈstʌdi", cn: "书房", page: "p.39", core: true },
-        { en: "kitchen", ipa: "ˈkɪtʃɪn", cn: "厨房", page: "p.39", core: true },
-        { en: "bathroom", ipa: "ˈbɑːθruːm", cn: "浴室；洗手间", page: "p.39", core: true },
-        { en: "bed", ipa: "bed", cn: "床", page: "p.42", core: true },
-        { en: "phone", ipa: "fəʊn", cn: "电话", page: "p.42", core: true },
-        { en: "table", ipa: "ˈteɪbl", cn: "桌子", page: "p.42", core: true },
-        { en: "sofa", ipa: "ˈsəʊfə", cn: "长沙发", page: "p.42", core: true },
-        { en: "fridge", ipa: "frɪdʒ", cn: "冰箱", page: "p.42", core: true },
-        { en: "find", ipa: "faɪnd", cn: "找到", page: "p.43", core: false },
-        { en: "them", ipa: "ðəm", cn: "他（她、它）们", page: "p.43", core: false }
-      ],
-      sentences: [
-        { en: "Is she in the living room?", cn: "她在客厅里吗？", page: "p.38" },
-        { en: "No, she isn't.", cn: "不，她不在。", page: "p.38" },
-        { en: "Where are the keys?", cn: "钥匙在哪儿？", page: "p.41" },
-        { en: "Are they on the table?", cn: "它们在桌子上吗？", page: "p.41" },
-        { en: "No, they aren't. They're in the door.", cn: "不，不在。它们在门上。", page: "p.41" },
-        { en: "Go to the living room. Watch TV.", cn: "去客厅。看电视。", page: "p.38" },
-        { en: "Where's Amy? Is she in the study?", cn: "埃米在哪儿？她在书房吗？", page: "p.39" }
-      ],
-      phonics: {
-        title: "字母 u 的两种读音",
-        desc: "教材 Let's spell：重点在 u-e 组合读字母音 /juː/；u 在闭音节中读 /ʌ/",
-        groups: [
-          { label: "u", ipa: "/ʌ/", words: ["us", "up", "bus"] },
-          { label: "u-e", ipa: "/juː/", words: ["use", "cute", "excuse"] }
-        ]
-      },
-      levels: [
-        { id: "U4-L1", type: "listen", name: "听音选词", desc: "听发音选出单词 · 约 1 分钟", icon: "ic-vol", color: "#3B82F6" },
-        { id: "U4-L2", type: "match", name: "词义配对", desc: "英文和中文连起来 · 约 1 分钟", icon: "ic-link", color: "#8B5CF6" },
-        { id: "U4-L3", type: "spell", name: "单词拼写", desc: "每关 10 题 · 约 2 分钟", icon: "ic-pen", color: "#F59E0B" },
-        { id: "U4-L4", type: "pop", name: "消消乐", desc: "点掉配对的卡片 · 约 2 分钟", icon: "ic-grid", color: "#10B981" },
-        { id: "U4-L5", type: "quiz", name: "闯关 PK", desc: "综合大题冲刺三星 · 约 2 分钟", icon: "ic-zap", color: "#EC4899" }
-      ]
-    },
-    {
-      id: "U5", no: 5, title: "Dinner's ready", cn: "晚餐准备好了",
-      pages: "P46 - P55", color: "#10B981",
-      words: [
-        { en: "beef", ipa: "biːf", cn: "牛肉", page: "p.49", core: true },
-        { en: "chicken", ipa: "ˈtʃɪkɪn", cn: "鸡肉", page: "p.49", core: true },
-        { en: "noodles", ipa: "ˈnuːdlz", cn: "面条", page: "p.49", core: true },
-        { en: "soup", ipa: "suːp", cn: "汤", page: "p.49", core: true },
-        { en: "vegetable", ipa: "ˈvedʒtəbl", cn: "蔬菜", page: "p.49", core: true },
-        { en: "chopsticks", ipa: "ˈtʃɒpstɪks", cn: "筷子", page: "p.52", core: true },
-        { en: "bowl", ipa: "bəʊl", cn: "碗", page: "p.52", core: true },
-        { en: "fork", ipa: "fɔːk", cn: "餐叉", page: "p.52", core: true },
-        { en: "knife", ipa: "naɪf", cn: "刀", page: "p.52", core: true },
-        { en: "spoon", ipa: "spuːn", cn: "勺", page: "p.52", core: true },
-        { en: "dinner", ipa: "ˈdɪnə(r)", cn: "（中午或晚上吃的）正餐", page: "p.48", core: false },
-        { en: "ready", ipa: "ˈredi", cn: "准备好", page: "p.48", core: false },
-        { en: "help yourself", ipa: "help jɔːˈself", cn: "为（自己）取用", page: "p.51", core: false },
-        { en: "pass", ipa: "pɑːs", cn: "给；递", page: "p.52", core: false },
-        { en: "try", ipa: "traɪ", cn: "试；尝试", page: "p.53", core: false }
-      ],
-      sentences: [
-        { en: "What's for dinner?", cn: "晚餐吃什么？", page: "p.48" },
-        { en: "What would you like?", cn: "你想吃什么？", page: "p.48" },
-        { en: "I'd like some soup and bread, please.", cn: "我想要汤和面包。（I'd like = I would like）", page: "p.48" },
-        { en: "Help yourself.", cn: "随便吃吧。", page: "p.51" },
-        { en: "Would you like a knife and fork?", cn: "你想要刀叉吗？", page: "p.51" },
-        { en: "No, thanks.", cn: "不了，谢谢。", page: "p.51" },
-        { en: "I can use chopsticks.", cn: "我会用筷子。", page: "p.51" }
-      ],
-      phonics: {
-        title: "字母 e 的两种读音",
-        desc: "教材 Let's spell：e 在闭音节读 /e/；词尾的 e 让单词读 /iː/（如 me / he / she / we）",
-        groups: [
-          { label: "e", ipa: "/e/", words: ["bed", "red", "pencil", "let", "get"] },
-          { label: "e（词尾）", ipa: "/iː/", words: ["be", "me", "he", "she", "we"] }
-        ]
-      },
-      levels: [
-        { id: "U5-L1", type: "listen", name: "听音选词", desc: "听发音选出单词 · 约 1 分钟", icon: "ic-vol", color: "#3B82F6" },
-        { id: "U5-L2", type: "match", name: "词义配对", desc: "英文和中文连起来 · 约 1 分钟", icon: "ic-link", color: "#8B5CF6" },
-        { id: "U5-L3", type: "spell", name: "单词拼写", desc: "每关 10 题 · 约 2 分钟", icon: "ic-pen", color: "#F59E0B" },
-        { id: "U5-L4", type: "pop", name: "消消乐", desc: "点掉配对的卡片 · 约 2 分钟", icon: "ic-grid", color: "#10B981" },
-        { id: "U5-L5", type: "quiz", name: "闯关 PK", desc: "综合大题冲刺三星 · 约 2 分钟", icon: "ic-zap", color: "#EC4899" }
-      ]
-    },
-    {
-      id: "U6", no: 6, title: "Meet my family!", cn: "认识我的家人",
-      pages: "P56 - P65", color: "#06B6D4",
-      words: [
-        { en: "parents", ipa: "ˈpeərənts", cn: "父母", page: "p.59", core: true },
-        { en: "cousin", ipa: "ˈkʌzn", cn: "同辈表亲（或堂亲）", page: "p.59", core: true },
-        { en: "uncle", ipa: "ˈʌŋkl", cn: "舅父；叔父；伯父；姑父；姨夫", page: "p.59", core: true },
-        { en: "aunt", ipa: "ɑːnt", cn: "姑母；姨母", page: "p.59", core: true },
-        { en: "baby brother", ipa: "ˈbeɪbi ˈbrʌðə(r)", cn: "婴儿小弟弟", page: "p.59", core: true },
-        { en: "doctor", ipa: "ˈdɒktə(r)", cn: "医生", page: "p.62", core: true },
-        { en: "cook", ipa: "kʊk", cn: "厨师", page: "p.62", core: true },
-        { en: "driver", ipa: "ˈdraɪvə(r)", cn: "司机", page: "p.62", core: true },
-        { en: "farmer", ipa: "ˈfɑːmə(r)", cn: "农民", page: "p.62", core: true },
-        { en: "nurse", ipa: "nɜːs", cn: "护士", page: "p.62", core: true },
-        { en: "people", ipa: "ˈpiːpl", cn: "人们", page: "p.58", core: false },
-        { en: "but", ipa: "bʌt", cn: "但是", page: "p.58", core: false },
-        { en: "little", ipa: "ˈlɪtl", cn: "小的", page: "p.58", core: false },
-        { en: "puppy", ipa: "ˈpʌpi", cn: "小狗", page: "p.58", core: false },
-        { en: "football player", ipa: "ˈfʊtbɔːl ˈpleɪə(r)", cn: "足球运动员", page: "p.61", core: false },
-        { en: "job", ipa: "dʒɒb", cn: "工作", page: "p.62", core: false },
-        { en: "basketball", ipa: "ˈbɑːskɪtbɔːl", cn: "篮球", page: "p.63", core: false }
-      ],
-      sentences: [
-        { en: "How many people are there in your family, Chen Jie?", cn: "你家有几口人，陈杰？", page: "p.58" },
-        { en: "Three.", cn: "三口人。", page: "p.58" },
-        { en: "My family has six people.", cn: "我家有六口人。", page: "p.58" },
-        { en: "Is this your uncle?", cn: "这是你叔叔吗？", page: "p.61" },
-        { en: "Yes, it is. He's a football player.", cn: "是的，他是位足球运动员。", page: "p.61" },
-        { en: "What's your aunt's job?", cn: "你婶婶做什么工作？", page: "p.61" },
-        { en: "She's a nurse.", cn: "她是位护士。", page: "p.61" }
-      ],
-      phonics: {
-        title: "元音字母读音总复习",
-        desc: "教材 Let's spell：把这一册学过的长音/短音对比串起来读一遍",
-        groups: [
-          { label: "长音（字母本音）", ipa: "eɪ / aɪ / əʊ / juː / iː", words: ["face", "rice", "nose", "use", "me", "we"] },
-          { label: "短音", ipa: "æ / ʌ / ɪ / e / ɒ", words: ["bag", "mum", "six", "leg", "dog"] }
-        ]
-      },
-      levels: [
-        { id: "U6-L1", type: "listen", name: "听音选词", desc: "听发音选出单词 · 约 1 分钟", icon: "ic-vol", color: "#3B82F6" },
-        { id: "U6-L2", type: "match", name: "词义配对", desc: "英文和中文连起来 · 约 1 分钟", icon: "ic-link", color: "#8B5CF6" },
-        { id: "U6-L3", type: "spell", name: "单词拼写", desc: "每关 10 题 · 约 2 分钟", icon: "ic-pen", color: "#F59E0B" },
-        { id: "U6-L4", type: "pop", name: "消消乐", desc: "点掉配对的卡片 · 约 2 分钟", icon: "ic-grid", color: "#10B981" },
-        { id: "U6-L5", type: "quiz", name: "闯关 PK", desc: "综合大题冲刺三星 · 约 2 分钟", icon: "ic-zap", color: "#EC4899" }
-      ]
-    }
+ {
+  "id": "U1",
+  "no": 1,
+  "title": "I love sports",
+  "cn": "我爱运动",
+  "words": [
+   {
+    "en": "sport",
+    "ipa": "spɔːt",
+    "cn": "体育运动",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "football",
+    "ipa": "ˈfʊtbɔːl",
+    "cn": "足球",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "basketball",
+    "ipa": "ˈbɑːskɪtbɔːl",
+    "cn": "篮球",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "ping-pong",
+    "ipa": "ˈpɪŋpɒŋ",
+    "cn": "乒乓球",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "table tennis",
+    "ipa": "ˈteɪbl ˈtenɪs",
+    "cn": "乒乓球",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "tennis",
+    "ipa": "ˈtenɪs",
+    "cn": "网球",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "volleyball",
+    "ipa": "ˈvɒlibɔːl",
+    "cn": "排球",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "badminton",
+    "ipa": "ˈbædmɪntən",
+    "cn": "羽毛球",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "swim",
+    "ipa": "swɪm",
+    "cn": "游泳",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "jump",
+    "ipa": "dʒʌmp",
+    "cn": "跳",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "run",
+    "ipa": "rʌn",
+    "cn": "跑",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "high",
+    "ipa": "haɪ",
+    "cn": "高",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "far",
+    "ipa": "fɑː",
+    "cn": "远",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "fast",
+    "ipa": "fɑːst",
+    "cn": "快",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "well",
+    "ipa": "wel",
+    "cn": "好",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "can",
+    "ipa": "kæn",
+    "cn": "能",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "can't",
+    "ipa": "kɑːnt",
+    "cn": "不能",
+    "page": "p.5",
+    "core": true
+   },
+   {
+    "en": "ability",
+    "ipa": "əˈbɪləti",
+    "cn": "能力",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "player",
+    "ipa": "ˈpleɪə",
+    "cn": "运动员",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "like",
+    "ipa": "laɪk",
+    "cn": "喜欢",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "hope",
+    "ipa": "həʊp",
+    "cn": "希望",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "lose",
+    "ipa": "luːz",
+    "cn": "丢失",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "because",
+    "ipa": "bɪˈkɒz",
+    "cn": "因为",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "cancer",
+    "ipa": "ˈkænsə",
+    "cn": "癌症",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "money",
+    "ipa": "ˈmʌni",
+    "cn": "钱",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "kind",
+    "ipa": "kaɪnd",
+    "cn": "种类；善良的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "keep",
+    "ipa": "kiːp",
+    "cn": "保持",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "month",
+    "ipa": "mʌnθ",
+    "cn": "月",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "year",
+    "ipa": "jɪə",
+    "cn": "年",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "remember",
+    "ipa": "rɪˈmembə",
+    "cn": "记住",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "fail",
+    "ipa": "feɪl",
+    "cn": "失败",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "give",
+    "ipa": "ɡɪv",
+    "cn": "给",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "give up",
+    "ipa": "ɡɪv ʌp",
+    "cn": "放弃",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "never",
+    "ipa": "ˈnevə",
+    "cn": "从不",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "try",
+    "ipa": "traɪ",
+    "cn": "尝试",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "try your best",
+    "ipa": "traɪ jɔː best",
+    "cn": "尽最大努力",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "star",
+    "ipa": "stɑː",
+    "cn": "明星",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "across",
+    "ipa": "əˈkrɒs",
+    "cn": "穿过",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "phew",
+    "ipa": "fjuː",
+    "cn": "（松口气的声音）",
+    "page": "",
+    "core": false
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Can you jump high, Daming?",
+    "cn": "大明，你能跳得高吗？",
+    "page": ""
+   },
+   {
+    "en": "No, I can't. But I can learn.",
+    "cn": "不，我不能。但我能学。",
+    "page": ""
+   },
+   {
+    "en": "Can Amy play ping-pong well?",
+    "cn": "埃米乒乓球打得好吗？",
+    "page": ""
+   },
+   {
+    "en": "Can Bobo jump far?",
+    "cn": "波波能跳得远吗？",
+    "page": ""
+   },
+   {
+    "en": "I like sports.",
+    "cn": "我喜欢体育运动。",
+    "page": ""
+   },
+   {
+    "en": "Sports Day! Come on, everybody!",
+    "cn": "运动日！大家加油！",
+    "page": ""
+   }
+  ],
+  "color": "#3B82F6",
+  "pages": "p.5 – p.18",
+  "levels": [
+   {
+    "id": "U1-L1",
+    "type": "listen",
+    "name": "听音选词",
+    "desc": "听发音选出单词 · 约 1 分钟",
+    "icon": "ic-vol",
+    "color": "#3B82F6"
+   },
+   {
+    "id": "U1-L2",
+    "type": "match",
+    "name": "词义配对",
+    "desc": "英文和中文连起来 · 约 1 分钟",
+    "icon": "ic-link",
+    "color": "#8B5CF6"
+   },
+   {
+    "id": "U1-L3",
+    "type": "spell",
+    "name": "单词拼写",
+    "desc": "每关 10 题 · 约 2 分钟",
+    "icon": "ic-pen",
+    "color": "#F59E0B"
+   },
+   {
+    "id": "U1-L4",
+    "type": "pop",
+    "name": "消消乐",
+    "desc": "点掉配对的卡片 · 约 2 分钟",
+    "icon": "ic-grid",
+    "color": "#10B981"
+   },
+   {
+    "id": "U1-L5",
+    "type": "quiz",
+    "name": "闯关 PK",
+    "desc": "综合大题冲刺三星 · 约 2 分钟",
+    "icon": "ic-zap",
+    "color": "#EC4899"
+   }
   ]
+ },
+ {
+  "id": "U2",
+  "no": 2,
+  "title": "Helping at home",
+  "cn": "在家帮忙",
+  "words": [
+   {
+    "en": "wash",
+    "ipa": "wɒʃ",
+    "cn": "洗",
+    "page": "p.19",
+    "core": true
+   },
+   {
+    "en": "dish",
+    "ipa": "dɪʃ",
+    "cn": "盘子",
+    "page": "p.19",
+    "core": true
+   },
+   {
+    "en": "feed",
+    "ipa": "fiːd",
+    "cn": "喂养",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "sweep",
+    "ipa": "swiːp",
+    "cn": "扫",
+    "page": "p.19",
+    "core": true
+   },
+   {
+    "en": "floor",
+    "ipa": "flɔː",
+    "cn": "地板",
+    "page": "p.19",
+    "core": true
+   },
+   {
+    "en": "rubbish",
+    "ipa": "ˈrʌbɪʃ",
+    "cn": "垃圾",
+    "page": "p.19",
+    "core": true
+   },
+   {
+    "en": "chore",
+    "ipa": "tʃɔː",
+    "cn": "家务",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "to-do list",
+    "ipa": "tə duː lɪst",
+    "cn": "待办清单",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "may",
+    "ipa": "meɪ",
+    "cn": "可以",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "outside",
+    "ipa": "ˌaʊtˈsaɪd",
+    "cn": "在外面",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "tidy",
+    "ipa": "ˈtaɪdi",
+    "cn": "整洁的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "easy",
+    "ipa": "ˈiːzi",
+    "cn": "容易的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "clean",
+    "ipa": "kliːn",
+    "cn": "干净的；打扫",
+    "page": "p.19",
+    "core": true
+   },
+   {
+    "en": "job",
+    "ipa": "dʒɒb",
+    "cn": "工作",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "Good job!",
+    "ipa": "ɡʊd dʒɒb",
+    "cn": "干得好！",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "dirty",
+    "ipa": "ˈdɜːti",
+    "cn": "脏的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "desk",
+    "ipa": "desk",
+    "cn": "书桌",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "wall",
+    "ipa": "wɔːl",
+    "cn": "墙",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "again",
+    "ipa": "əˈɡen",
+    "cn": "又",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "also",
+    "ipa": "ˈɔːlsəʊ",
+    "cn": "也",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "sunshine",
+    "ipa": "ˈsʌnʃaɪn",
+    "cn": "阳光",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "sometimes",
+    "ipa": "ˈsʌmtaɪmz",
+    "cn": "有时",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "feel",
+    "ipa": "fiːl",
+    "cn": "感觉",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "tired",
+    "ipa": "ˈtaɪəd",
+    "cn": "累的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "helpful",
+    "ipa": "ˈhelpfl",
+    "cn": "有帮助的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "warm",
+    "ipa": "wɔːm",
+    "cn": "温暖的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "warm-up",
+    "ipa": "wɔːm ʌp",
+    "cn": "热身",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "water",
+    "ipa": "ˈwɔːtə",
+    "cn": "水；浇水",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "yard",
+    "ipa": "jɑːd",
+    "cn": "院子",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "helper",
+    "ipa": "ˈhelpə",
+    "cn": "帮手",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "pig",
+    "ipa": "pɪɡ",
+    "cn": "猪",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "cow",
+    "ipa": "kaʊ",
+    "cn": "奶牛",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "grass",
+    "ipa": "ɡrɑːs",
+    "cn": "草",
+    "page": "",
+    "core": false
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Can you help me clean the floor?",
+    "cn": "你能帮我擦地板吗？",
+    "page": ""
+   },
+   {
+    "en": "May I go outside to play?",
+    "cn": "我可以出去玩吗？",
+    "page": ""
+   },
+   {
+    "en": "Wenwen is so helpful.",
+    "cn": "雯雯真能干。",
+    "page": ""
+   },
+   {
+    "en": "What chores can you do?",
+    "cn": "你会做什么家务？",
+    "page": ""
+   }
+  ],
+  "color": "#8B5CF6",
+  "pages": "p.19 – p.34",
+  "levels": [
+   {
+    "id": "U2-L1",
+    "type": "listen",
+    "name": "听音选词",
+    "desc": "听发音选出单词 · 约 1 分钟",
+    "icon": "ic-vol",
+    "color": "#3B82F6"
+   },
+   {
+    "id": "U2-L2",
+    "type": "match",
+    "name": "词义配对",
+    "desc": "英文和中文连起来 · 约 1 分钟",
+    "icon": "ic-link",
+    "color": "#8B5CF6"
+   },
+   {
+    "id": "U2-L3",
+    "type": "spell",
+    "name": "单词拼写",
+    "desc": "每关 10 题 · 约 2 分钟",
+    "icon": "ic-pen",
+    "color": "#F59E0B"
+   },
+   {
+    "id": "U2-L4",
+    "type": "pop",
+    "name": "消消乐",
+    "desc": "点掉配对的卡片 · 约 2 分钟",
+    "icon": "ic-grid",
+    "color": "#10B981"
+   },
+   {
+    "id": "U2-L5",
+    "type": "quiz",
+    "name": "闯关 PK",
+    "desc": "综合大题冲刺三星 · 约 2 分钟",
+    "icon": "ic-zap",
+    "color": "#EC4899"
+   }
+  ]
+ },
+ {
+  "id": "U3",
+  "no": 3,
+  "title": "What's the weather like?",
+  "cn": "天气怎么样",
+  "words": [
+   {
+    "en": "weather",
+    "ipa": "ˈweðə",
+    "cn": "天气",
+    "page": "p.35",
+    "core": true
+   },
+   {
+    "en": "sunny",
+    "ipa": "ˈsʌni",
+    "cn": "晴朗的",
+    "page": "p.35",
+    "core": true
+   },
+   {
+    "en": "cloud",
+    "ipa": "klaʊd",
+    "cn": "云",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "cloudy",
+    "ipa": "ˈklaʊdi",
+    "cn": "多云的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "blow",
+    "ipa": "bləʊ",
+    "cn": "吹",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "windy",
+    "ipa": "ˈwɪndi",
+    "cn": "有风的",
+    "page": "p.35",
+    "core": true
+   },
+   {
+    "en": "rain",
+    "ipa": "reɪn",
+    "cn": "雨",
+    "page": "p.35",
+    "core": true
+   },
+   {
+    "en": "rainy",
+    "ipa": "ˈreɪni",
+    "cn": "下雨的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "snow",
+    "ipa": "snəʊ",
+    "cn": "雪",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "any",
+    "ipa": "ˈeni",
+    "cn": "任何",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "cold",
+    "ipa": "kəʊld",
+    "cn": "冷的",
+    "page": "p.35",
+    "core": true
+   },
+   {
+    "en": "or",
+    "ipa": "ɔː",
+    "cn": "或者",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "hot",
+    "ipa": "hɒt",
+    "cn": "热的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "enjoy",
+    "ipa": "ɪnˈdʒɔɪ",
+    "cn": "享受",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "diary",
+    "ipa": "ˈdaɪəri",
+    "cn": "日记",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "teacher",
+    "ipa": "ˈtiːtʃə",
+    "cn": "老师",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "taste",
+    "ipa": "teɪst",
+    "cn": "尝",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "ice cream",
+    "ipa": "aɪs kriːm",
+    "cn": "冰淇淋",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "real",
+    "ipa": "ˈrɪəl",
+    "cn": "真的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "later",
+    "ipa": "ˈleɪtə",
+    "cn": "后来",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "coat",
+    "ipa": "kəʊt",
+    "cn": "外套",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "turn",
+    "ipa": "tɜːn",
+    "cn": "转向",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "turn on",
+    "ipa": "tɜːn ɒn",
+    "cn": "打开",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "TV",
+    "ipa": "ˌtiː ˈviː",
+    "cn": "电视",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "report",
+    "ipa": "rɪˈpɔːt",
+    "cn": "报告",
+    "page": "",
+    "core": false
+   }
+  ],
+  "sentences": [
+   {
+    "en": "What's the weather like?",
+    "cn": "天气怎么样？",
+    "page": ""
+   },
+   {
+    "en": "It's sunny and warm.",
+    "cn": "晴朗又温暖。",
+    "page": ""
+   },
+   {
+    "en": "It's cold and snowy.",
+    "cn": "寒冷又下雪。",
+    "page": ""
+   }
+  ],
+  "color": "#10B981",
+  "pages": "p.35 – p.46",
+  "levels": [
+   {
+    "id": "U3-L1",
+    "type": "listen",
+    "name": "听音选词",
+    "desc": "听发音选出单词 · 约 1 分钟",
+    "icon": "ic-vol",
+    "color": "#3B82F6"
+   },
+   {
+    "id": "U3-L2",
+    "type": "match",
+    "name": "词义配对",
+    "desc": "英文和中文连起来 · 约 1 分钟",
+    "icon": "ic-link",
+    "color": "#8B5CF6"
+   },
+   {
+    "id": "U3-L3",
+    "type": "spell",
+    "name": "单词拼写",
+    "desc": "每关 10 题 · 约 2 分钟",
+    "icon": "ic-pen",
+    "color": "#F59E0B"
+   },
+   {
+    "id": "U3-L4",
+    "type": "pop",
+    "name": "消消乐",
+    "desc": "点掉配对的卡片 · 约 2 分钟",
+    "icon": "ic-grid",
+    "color": "#10B981"
+   },
+   {
+    "id": "U3-L5",
+    "type": "quiz",
+    "name": "闯关 PK",
+    "desc": "综合大题冲刺三星 · 约 2 分钟",
+    "icon": "ic-zap",
+    "color": "#EC4899"
+   }
+  ]
+ },
+ {
+  "id": "U4",
+  "no": 4,
+  "title": "Wonderful seasons",
+  "cn": "美妙的季节",
+  "words": [
+   {
+    "en": "season",
+    "ipa": "ˈsiːzn",
+    "cn": "季节",
+    "page": "p.47",
+    "core": true
+   },
+   {
+    "en": "spring",
+    "ipa": "sprɪŋ",
+    "cn": "春天",
+    "page": "p.47",
+    "core": true
+   },
+   {
+    "en": "summer",
+    "ipa": "ˈsʌmə",
+    "cn": "夏天",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "autumn",
+    "ipa": "ˈɔːtəm",
+    "cn": "秋天",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "winter",
+    "ipa": "ˈwɪntə",
+    "cn": "冬天",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "favourite",
+    "ipa": "ˈfeɪvərɪt",
+    "cn": "最喜欢的",
+    "page": "p.47",
+    "core": true
+   },
+   {
+    "en": "birthday",
+    "ipa": "ˈbɜːθdeɪ",
+    "cn": "生日",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "fly",
+    "ipa": "flaɪ",
+    "cn": "飞",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "snowstorm",
+    "ipa": "ˈsnəʊstɔːm",
+    "cn": "暴风雪",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "beach",
+    "ipa": "biːtʃ",
+    "cn": "海滩",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "sea",
+    "ipa": "siː",
+    "cn": "海",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "equator",
+    "ipa": "ɪˈkweɪtə",
+    "cn": "赤道",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "round",
+    "ipa": "raʊnd",
+    "cn": "圆的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "all year round",
+    "ipa": "ɔːl jɪə raʊnd",
+    "cn": "全年",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "quite",
+    "ipa": "kwaɪt",
+    "cn": "相当",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "join",
+    "ipa": "dʒɔɪn",
+    "cn": "加入",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "bus",
+    "ipa": "bʌs",
+    "cn": "公共汽车",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "car",
+    "ipa": "kɑː",
+    "cn": "汽车",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "train",
+    "ipa": "treɪn",
+    "cn": "火车",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "plane",
+    "ipa": "pleɪn",
+    "cn": "飞机",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "town",
+    "ipa": "taʊn",
+    "cn": "城镇",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "place",
+    "ipa": "pleɪs",
+    "cn": "地方",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "near",
+    "ipa": "nɪə",
+    "cn": "在…附近",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "travel",
+    "ipa": "ˈtrævl",
+    "cn": "旅行",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "way",
+    "ipa": "weɪ",
+    "cn": "路",
+    "page": "",
+    "core": false
+   }
+  ],
+  "sentences": [
+   {
+    "en": "What's your favourite season?",
+    "cn": "你最喜欢的季节是什么？",
+    "page": ""
+   },
+   {
+    "en": "I like spring.",
+    "cn": "我喜欢春天。",
+    "page": ""
+   },
+   {
+    "en": "It's warm in spring.",
+    "cn": "春天很温暖。",
+    "page": ""
+   }
+  ],
+  "color": "#F59E0B",
+  "pages": "p.47 – p.58",
+  "levels": [
+   {
+    "id": "U4-L1",
+    "type": "listen",
+    "name": "听音选词",
+    "desc": "听发音选出单词 · 约 1 分钟",
+    "icon": "ic-vol",
+    "color": "#3B82F6"
+   },
+   {
+    "id": "U4-L2",
+    "type": "match",
+    "name": "词义配对",
+    "desc": "英文和中文连起来 · 约 1 分钟",
+    "icon": "ic-link",
+    "color": "#8B5CF6"
+   },
+   {
+    "id": "U4-L3",
+    "type": "spell",
+    "name": "单词拼写",
+    "desc": "每关 10 题 · 约 2 分钟",
+    "icon": "ic-pen",
+    "color": "#F59E0B"
+   },
+   {
+    "id": "U4-L4",
+    "type": "pop",
+    "name": "消消乐",
+    "desc": "点掉配对的卡片 · 约 2 分钟",
+    "icon": "ic-grid",
+    "color": "#10B981"
+   },
+   {
+    "id": "U4-L5",
+    "type": "quiz",
+    "name": "闯关 PK",
+    "desc": "综合大题冲刺三星 · 约 2 分钟",
+    "icon": "ic-zap",
+    "color": "#EC4899"
+   }
+  ]
+ },
+ {
+  "id": "U5",
+  "no": 5,
+  "title": "Let's go!",
+  "cn": "我们出发吧",
+  "words": [
+   {
+    "en": "minute",
+    "ipa": "ˈmɪnɪt",
+    "cn": "分钟",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "straight",
+    "ipa": "streɪt",
+    "cn": "直的",
+    "page": "p.59",
+    "core": true
+   },
+   {
+    "en": "wear",
+    "ipa": "weə",
+    "cn": "穿",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "library",
+    "ipa": "ˈlaɪbrəri",
+    "cn": "图书馆",
+    "page": "p.59",
+    "core": true
+   },
+   {
+    "en": "live",
+    "ipa": "lɪv",
+    "cn": "居住",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "centre",
+    "ipa": "ˈsentə",
+    "cn": "中心",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "away",
+    "ipa": "əˈweɪ",
+    "cn": "远离",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "cinema",
+    "ipa": "ˈsɪnəmə",
+    "cn": "电影院",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "truck",
+    "ipa": "trʌk",
+    "cn": "卡车",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "hospital",
+    "ipa": "ˈhɒspɪtl",
+    "cn": "医院",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "bamboo",
+    "ipa": "ˌbæmˈbuː",
+    "cn": "竹子",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "bike",
+    "ipa": "baɪk",
+    "cn": "自行车",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "museum",
+    "ipa": "mjuˈziːəm",
+    "cn": "博物馆",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "tomorrow",
+    "ipa": "təˈmɒrəʊ",
+    "cn": "明天",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "woman",
+    "ipa": "ˈwʊmən",
+    "cn": "女人",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "subway",
+    "ipa": "ˈsʌbweɪ",
+    "cn": "地铁",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "wish",
+    "ipa": "wɪʃ",
+    "cn": "希望",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "step",
+    "ipa": "step",
+    "cn": "脚步",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "tram",
+    "ipa": "træm",
+    "cn": "有轨电车",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "own",
+    "ipa": "əʊn",
+    "cn": "自己的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "supermarket",
+    "ipa": "ˈsuːpəmɑːkɪt",
+    "cn": "超市",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "ring",
+    "ipa": "rɪŋ",
+    "cn": "响",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "beep",
+    "ipa": "biːp",
+    "cn": "哔哔声",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "on one's own",
+    "ipa": "ɒn wʌnz əʊn",
+    "cn": "独自",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "cross",
+    "ipa": "krɒs",
+    "cn": "穿过",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "careful",
+    "ipa": "ˈkeəfl",
+    "cn": "小心的",
+    "page": "p.59",
+    "core": true
+   },
+   {
+    "en": "be careful",
+    "ipa": "biː ˈkeəfl",
+    "cn": "小心",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "underground",
+    "ipa": "ˈʌndəɡraʊnd",
+    "cn": "地铁",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "wheel",
+    "ipa": "wiːl",
+    "cn": "轮子",
+    "page": "",
+    "core": false
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Go straight.",
+    "cn": "直走。",
+    "page": ""
+   },
+   {
+    "en": "Turn left.",
+    "cn": "左转。",
+    "page": ""
+   },
+   {
+    "en": "The library is near the park.",
+    "cn": "图书馆在公园附近。",
+    "page": ""
+   }
+  ],
+  "color": "#EC4899",
+  "pages": "p.59 – p.70",
+  "levels": [
+   {
+    "id": "U5-L1",
+    "type": "listen",
+    "name": "听音选词",
+    "desc": "听发音选出单词 · 约 1 分钟",
+    "icon": "ic-vol",
+    "color": "#3B82F6"
+   },
+   {
+    "id": "U5-L2",
+    "type": "match",
+    "name": "词义配对",
+    "desc": "英文和中文连起来 · 约 1 分钟",
+    "icon": "ic-link",
+    "color": "#8B5CF6"
+   },
+   {
+    "id": "U5-L3",
+    "type": "spell",
+    "name": "单词拼写",
+    "desc": "每关 10 题 · 约 2 分钟",
+    "icon": "ic-pen",
+    "color": "#F59E0B"
+   },
+   {
+    "id": "U5-L4",
+    "type": "pop",
+    "name": "消消乐",
+    "desc": "点掉配对的卡片 · 约 2 分钟",
+    "icon": "ic-grid",
+    "color": "#10B981"
+   },
+   {
+    "id": "U5-L5",
+    "type": "quiz",
+    "name": "闯关 PK",
+    "desc": "综合大题冲刺三星 · 约 2 分钟",
+    "icon": "ic-zap",
+    "color": "#EC4899"
+   }
+  ]
+ },
+ {
+  "id": "U6",
+  "no": 6,
+  "title": "Find your way",
+  "cn": "找到你的路",
+  "words": [
+   {
+    "en": "wheel",
+    "ipa": "wiːl",
+    "cn": "轮子",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "map",
+    "ipa": "mæp",
+    "cn": "地图",
+    "page": "p.71",
+    "core": true
+   },
+   {
+    "en": "left",
+    "ipa": "left",
+    "cn": "左",
+    "page": "p.71",
+    "core": true
+   },
+   {
+    "en": "right",
+    "ipa": "raɪt",
+    "cn": "右",
+    "page": "p.71",
+    "core": true
+   },
+   {
+    "en": "behind",
+    "ipa": "bɪˈhaɪnd",
+    "cn": "在…后面",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "beside",
+    "ipa": "bɪˈsaɪd",
+    "cn": "在…旁边",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "between",
+    "ipa": "bɪˈtwiːn",
+    "cn": "在…之间",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "in front of",
+    "ipa": "ɪn frʌnt ɒv",
+    "cn": "在…前面",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "next to",
+    "ipa": "nekst tuː",
+    "cn": "紧挨着",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "near",
+    "ipa": "nɪə",
+    "cn": "在…附近",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "far",
+    "ipa": "fɑː",
+    "cn": "远的",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "go straight",
+    "ipa": "ɡəʊ streɪt",
+    "cn": "直走",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "turn left",
+    "ipa": "tɜːn left",
+    "cn": "左转",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "turn right",
+    "ipa": "tɜːn raɪt",
+    "cn": "右转",
+    "page": "",
+    "core": false
+   },
+   {
+    "en": "place",
+    "ipa": "pleɪs",
+    "cn": "地方",
+    "page": "",
+    "core": false
+   }
+  ],
+  "sentences": [
+   {
+    "en": "Where is the museum?",
+    "cn": "博物馆在哪儿？",
+    "page": ""
+   },
+   {
+    "en": "It's next to the school.",
+    "cn": "它在学校旁边。",
+    "page": ""
+   },
+   {
+    "en": "Go straight and turn left.",
+    "cn": "直走然后左转。",
+    "page": ""
+   }
+  ],
+  "color": "#06B6D4",
+  "pages": "p.71 – p.82",
+  "levels": [
+   {
+    "id": "U6-L1",
+    "type": "listen",
+    "name": "听音选词",
+    "desc": "听发音选出单词 · 约 1 分钟",
+    "icon": "ic-vol",
+    "color": "#3B82F6"
+   },
+   {
+    "id": "U6-L2",
+    "type": "match",
+    "name": "词义配对",
+    "desc": "英文和中文连起来 · 约 1 分钟",
+    "icon": "ic-link",
+    "color": "#8B5CF6"
+   },
+   {
+    "id": "U6-L3",
+    "type": "spell",
+    "name": "单词拼写",
+    "desc": "每关 10 题 · 约 2 分钟",
+    "icon": "ic-pen",
+    "color": "#F59E0B"
+   },
+   {
+    "id": "U6-L4",
+    "type": "pop",
+    "name": "消消乐",
+    "desc": "点掉配对的卡片 · 约 2 分钟",
+    "icon": "ic-grid",
+    "color": "#10B981"
+   },
+   {
+    "id": "U6-L5",
+    "type": "quiz",
+    "name": "闯关 PK",
+    "desc": "综合大题冲刺三星 · 约 2 分钟",
+    "icon": "ic-zap",
+    "color": "#EC4899"
+   }
+  ]
+ }
+]
 };
 
 /* 宠物成长阶段（积分门槛，答案：答对 +10、通关 +20、三星 +15） */
@@ -2587,6 +3917,10 @@ function renderBook() {
     return;
   }
   var ph = u.phonics;
+  if (!ph) {
+    body.innerHTML = '<p class="sub" style="margin:14px 0 4px">外研版课本没有单独的「发音专项」板块。点上方单词卡片上的喇叭按钮可听每个词的标准英式发音；用「跟读录音」能对比自己的读音。</p>';
+    return;
+  }
   body.innerHTML = '<div class="card" style="box-shadow:none;border:none;padding:0;margin-bottom:12px">'
     + "<h4 style=\"margin-bottom:4px\">" + esc(ph.title) + "</h4>"
     + '<p class="sub">' + esc(ph.desc) + "</p></div>"
