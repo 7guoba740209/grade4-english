@@ -928,6 +928,10 @@ select.input{cursor:pointer}
           <h3><svg><use href="#ic-book"/></svg>单元地图</h3>
           <span class="sub">点击进入关卡</span>
         </div>
+        <div id="volSwitch" style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="btn btn-o btn-sm vol-btn" data-vol="上册" style="flex:1;background:#2563EB;color:#fff;border-color:#2563EB">上册</button>
+          <button class="btn btn-o btn-sm vol-btn" data-vol="下册" style="flex:1">下册</button>
+        </div>
         <div class="units" id="unitMap"></div>
       </div>
     </section>
@@ -1081,7 +1085,7 @@ select.input{cursor:pointer}
 <script>
 /* =====================================================================
    四年级英语游戏化学习平台
-   数据来源：外研版（三年级起点）英语 四年级上册 · 国家中小学智慧教育平台电子教材
+   数据来源：外研版（三年级起点）英语 四年级上册+下册 · 国家中小学智慧教育平台电子教材
              单词/音标/释义/页码均从教材附录一「单元词汇表」逐条提取
              core=true 表示教材标注的「黑体词」（要求听、说、认读）
    分层：数据层 -> 计算层 -> 渲染层，渲染函数之间严禁互调，
@@ -1089,7 +1093,8 @@ select.input{cursor:pointer}
    ===================================================================== */
 
 /* ------------------------- 1. 教材数据层 ------------------------- */
-var CURRICULUM = {
+var CURRICULA = {
+  "上册": {
   book: "外研版（三年级起点）· 英语 四年级上册",
   units: [
  {
@@ -2689,7 +2694,37 @@ var CURRICULUM = {
   ]
  }
 ]
+},
+  "下册": {"book": "外研版（三年级起点）· 英语 四年级下册", "units": [{"id": "D1", "no": 1, "title": "People at work", "cn": "人们的工作", "color": "#3B82F6", "pages": "p.2 – p.11", "words": [{"en": "doctor", "ipa": "ˈdɒktə", "cn": "医生，大夫", "page": "", "core": true}, {"en": "fireman", "ipa": "ˈfaɪəmən", "cn": "消防队员", "page": "", "core": false}, {"en": "farmer", "ipa": "ˈfɑːmə", "cn": "农民；农场主；养殖场主", "page": "", "core": true}, {"en": "cook", "ipa": "kʊk", "cn": "厨师，炊事员", "page": "", "core": true}, {"en": "police", "ipa": "pəˈliːs", "cn": "警察", "page": "", "core": true}, {"en": "police officer", "ipa": "pəˈliːs ˈɒfɪsə", "cn": "警察，警官", "page": "", "core": false}, {"en": "police station", "ipa": "pəˈliːs ˈsteɪʃn", "cn": "警察（分）局，派出所", "page": "", "core": false}, {"en": "station", "ipa": "ˈsteɪʃn", "cn": "所；站；台；局", "page": "", "core": false}, {"en": "often", "ipa": "ˈɒfn", "cn": "经常，时常，多次", "page": "", "core": true}, {"en": "field", "ipa": "fiːld", "cn": "田地，田野", "page": "", "core": false}, {"en": "painter", "ipa": "ˈpeɪntə", "cn": "画家", "page": "", "core": false}, {"en": "use", "ipa": "juːz", "cn": "用，使用", "page": "", "core": true}, {"en": "brush", "ipa": "brʌʃ", "cn": "刷子；毛刷", "page": "", "core": false}, {"en": "scientist", "ipa": "ˈsaɪəntɪst", "cn": "科学家", "page": "", "core": false}, {"en": "writer", "ipa": "ˈraɪtə", "cn": "作家；作者", "page": "", "core": false}, {"en": "worker", "ipa": "ˈwɜːkə", "cn": "工人", "page": "", "core": false}, {"en": "aunt", "ipa": "ɑːnt", "cn": "姑母；姨母", "page": "", "core": false}, {"en": "night", "ipa": "naɪt", "cn": "夜晚，夜间", "page": "", "core": true}, {"en": "owl", "ipa": "aʊl", "cn": "猫头鹰", "page": "", "core": false}, {"en": "night owl", "ipa": "naɪt aʊl", "cn": "夜猫子，喜欢熬夜的人", "page": "", "core": false}, {"en": "driver", "ipa": "ˈdraɪvə", "cn": "司机，驾驶员", "page": "", "core": true}, {"en": "taxi", "ipa": "ˈtæksi", "cn": "出租车，计程车", "page": "", "core": true}, {"en": "safe", "ipa": "seɪf", "cn": "安全的，没有危险的", "page": "", "core": true}, {"en": "nurse", "ipa": "nɜːs", "cn": "护士", "page": "", "core": true}, {"en": "light", "ipa": "laɪt", "cn": "照亮", "page": "", "core": true}, {"en": "uncle", "ipa": "ˈʌŋkl", "cn": "叔叔，伯伯", "page": "", "core": true}, {"en": "bake", "ipa": "beɪk", "cn": "烘，烤，焙", "page": "", "core": true}, {"en": "bee", "ipa": "biː", "cn": "蜜蜂", "page": "", "core": true}, {"en": "same", "ipa": "seɪm", "cn": "相同的，完全相同的，一模一样的", "page": "", "core": false}, {"en": "sound", "ipa": "saʊnd", "cn": "声，声音", "page": "", "core": false}, {"en": "postman", "ipa": "ˈpəʊstmən", "cn": "邮递员", "page": "", "core": false}, {"en": "life", "ipa": "laɪf", "cn": "生活", "page": "", "core": false}, {"en": "mountain", "ipa": "ˈmaʊntən", "cn": "高山", "page": "", "core": false}], "sentences": [{"en": "What does he do?", "cn": "他是做什么工作的？", "page": ""}, {"en": "He's a scientist.", "cn": "他是一名科学家。", "page": ""}, {"en": "Is he a farmer?", "cn": "他是农民吗？", "page": ""}, {"en": "Yes, he is. / No, he isn't.", "cn": "是的，他是。/ 不，他不是。", "page": ""}], "levels": [{"id": "D1-L1", "type": "listen", "name": "听音选词", "desc": "听发音选出单词 · 约 1 分钟", "icon": "ic-vol", "color": "#3B82F6"}, {"id": "D1-L2", "type": "match", "name": "词义配对", "desc": "英文和中文连起来 · 约 1 分钟", "icon": "ic-link", "color": "#8B5CF6"}, {"id": "D1-L3", "type": "spell", "name": "单词拼写", "desc": "每关 10 题 · 约 2 分钟", "icon": "ic-pen", "color": "#F59E0B"}, {"id": "D1-L4", "type": "pop", "name": "消消乐", "desc": "点掉配对的卡片 · 约 2 分钟", "icon": "ic-grid", "color": "#10B981"}, {"id": "D1-L5", "type": "quiz", "name": "闯关 PK", "desc": "综合大题冲刺三星 · 约 2 分钟", "icon": "ic-zap", "color": "#EC4899"}]}, {"id": "D2", "no": 2, "title": "Feelings", "cn": "情感", "color": "#EC4899", "pages": "p.13 – p.24", "words": [{"en": "laugh", "ipa": "lɑːf", "cn": "发出笑声，（大）笑", "page": "", "core": false}, {"en": "sad", "ipa": "sæd", "cn": "不愉快的，伤心的，难过的", "page": "", "core": true}, {"en": "scared", "ipa": "skeəd", "cn": "害怕的，恐惧的；紧张的", "page": "", "core": false}, {"en": "angry", "ipa": "ˈæŋɡri", "cn": "发怒的，生气的，气愤的", "page": "", "core": true}, {"en": "excited", "ipa": "ɪkˈsaɪtɪd", "cn": "兴奋的，激动的", "page": "", "core": true}, {"en": "opera", "ipa": "ˈɒprə", "cn": "歌剧", "page": "", "core": false}, {"en": "next", "ipa": "nekst", "cn": "（时间）紧接着的；下次的", "page": "", "core": true}, {"en": "cough", "ipa": "kɒf", "cn": "咳嗽，咳", "page": "", "core": false}, {"en": "better", "ipa": "ˈbetə", "cn": "（健康状况）好转的；（疼痛、伤势等）减轻的", "page": "", "core": false}, {"en": "gift", "ipa": "ɡɪft", "cn": "礼物", "page": "", "core": true}, {"en": "model", "ipa": "ˈmɒdl", "cn": "（尤指可拼装的）模型", "page": "", "core": false}, {"en": "shout", "ipa": "ʃaʊt", "cn": "大声说，喊叫，呼喊", "page": "", "core": true}, {"en": "should", "ipa": "ʃʊd", "cn": "应当，应该", "page": "", "core": true}, {"en": "feeling", "ipa": "ˈfiːlɪŋ", "cn": "感觉，感触", "page": "", "core": false}, {"en": "huge", "ipa": "hjuːdʒ", "cn": "巨大的", "page": "", "core": false}, {"en": "worried", "ipa": "ˈwʌrid", "cn": "担心的，焦虑的", "page": "", "core": false}, {"en": "street", "ipa": "striːt", "cn": "大街，街道", "page": "", "core": true}, {"en": "hit", "ipa": "hɪt", "cn": "撞击，碰撞", "page": "", "core": false}], "sentences": [{"en": "How are you feeling today?", "cn": "你今天感觉怎么样？", "page": ""}, {"en": "I'm feeling better now.", "cn": "我现在感觉好多了。", "page": ""}, {"en": "Why are you crying?", "cn": "你为什么哭呀？", "page": ""}], "levels": [{"id": "D2-L1", "type": "listen", "name": "听音选词", "desc": "听发音选出单词 · 约 1 分钟", "icon": "ic-vol", "color": "#3B82F6"}, {"id": "D2-L2", "type": "match", "name": "词义配对", "desc": "英文和中文连起来 · 约 1 分钟", "icon": "ic-link", "color": "#8B5CF6"}, {"id": "D2-L3", "type": "spell", "name": "单词拼写", "desc": "每关 10 题 · 约 2 分钟", "icon": "ic-pen", "color": "#F59E0B"}, {"id": "D2-L4", "type": "pop", "name": "消消乐", "desc": "点掉配对的卡片 · 约 2 分钟", "icon": "ic-grid", "color": "#10B981"}, {"id": "D2-L5", "type": "quiz", "name": "闯关 PK", "desc": "综合大题冲刺三星 · 约 2 分钟", "icon": "ic-zap", "color": "#EC4899"}]}, {"id": "D3", "no": 3, "title": "Talents", "cn": "才艺", "color": "#8B5CF6", "pages": "p.27 – p.39", "words": [{"en": "talent", "ipa": "ˈtælənt", "cn": "天资，天赋，才能", "page": "", "core": false}, {"en": "act", "ipa": "ækt", "cn": "演出；扮演", "page": "", "core": false}, {"en": "magic", "ipa": "ˈmædʒɪk", "cn": "魔术，戏法", "page": "", "core": false}, {"en": "shine", "ipa": "ʃaɪn", "cn": "表现突出，出众", "page": "", "core": false}, {"en": "puzzle", "ipa": "ˈpʌzl", "cn": "拼图游戏", "page": "", "core": false}, {"en": "dancer", "ipa": "ˈdɑːnsə", "cn": "舞蹈演员", "page": "", "core": false}, {"en": "win", "ipa": "wɪn", "cn": "获胜，赢", "page": "", "core": true}, {"en": "just", "ipa": "dʒʌst", "cn": "就，只是", "page": "", "core": false}, {"en": "boy", "ipa": "bɔɪ", "cn": "男孩；儿子", "page": "", "core": true}, {"en": "slowly", "ipa": "ˈsləʊli", "cn": "缓慢地，慢慢地", "page": "", "core": false}], "sentences": [{"en": "What's she doing?", "cn": "她在做什么？", "page": ""}, {"en": "She's painting.", "cn": "她在画画。", "page": ""}, {"en": "What's his talent?", "cn": "他的才艺是什么？", "page": ""}], "levels": [{"id": "D3-L1", "type": "listen", "name": "听音选词", "desc": "听发音选出单词 · 约 1 分钟", "icon": "ic-vol", "color": "#3B82F6"}, {"id": "D3-L2", "type": "match", "name": "词义配对", "desc": "英文和中文连起来 · 约 1 分钟", "icon": "ic-link", "color": "#8B5CF6"}, {"id": "D3-L3", "type": "spell", "name": "单词拼写", "desc": "每关 10 题 · 约 2 分钟", "icon": "ic-pen", "color": "#F59E0B"}, {"id": "D3-L4", "type": "pop", "name": "消消乐", "desc": "点掉配对的卡片 · 约 2 分钟", "icon": "ic-grid", "color": "#10B981"}, {"id": "D3-L5", "type": "quiz", "name": "闯关 PK", "desc": "综合大题冲刺三星 · 约 2 分钟", "icon": "ic-zap", "color": "#EC4899"}]}, {"id": "D4", "no": 4, "title": "Plants", "cn": "植物", "color": "#10B981", "pages": "p.41 – p.49", "words": [{"en": "seed", "ipa": "siːd", "cn": "种子，籽", "page": "", "core": false}, {"en": "earth", "ipa": "ɜːθ", "cn": "泥土，土壤", "page": "", "core": true}, {"en": "root", "ipa": "ruːt", "cn": "根", "page": "", "core": false}, {"en": "stem", "ipa": "stem", "cn": "（植物的）茎，梗，柄", "page": "", "core": false}, {"en": "thin", "ipa": "θɪn", "cn": "细的", "page": "", "core": true}, {"en": "leaf", "ipa": "liːf", "cn": "叶，叶子", "page": "", "core": false}, {"en": "dig", "ipa": "dɪɡ", "cn": "挖，掘", "page": "", "core": false}, {"en": "sunflower", "ipa": "ˈsʌnflaʊə", "cn": "向日葵", "page": "", "core": false}, {"en": "plant", "ipa": "plɑːnt", "cn": "种植，栽种；播（种）", "page": "", "core": true}, {"en": "dream", "ipa": "driːm", "cn": "梦想，愿望，理想", "page": "", "core": false}, {"en": "sleep", "ipa": "sliːp", "cn": "睡，睡觉", "page": "", "core": true}, {"en": "will", "ipa": "wɪl", "cn": "将，会，要", "page": "", "core": true}, {"en": "true", "ipa": "truː", "cn": "真的，真实的", "page": "", "core": false}, {"en": "come true", "ipa": "kʌm truː", "cn": "实现", "page": "", "core": true}, {"en": "paper", "ipa": "ˈpeɪpə", "cn": "纸", "page": "", "core": true}], "sentences": [{"en": "Are your seeds growing?", "cn": "你的种子在长大吗？", "page": ""}, {"en": "It has thin leaves.", "cn": "它有细细的叶子。", "page": ""}, {"en": "His dreams will come true!", "cn": "他的梦想会实现的！", "page": ""}], "levels": [{"id": "D4-L1", "type": "listen", "name": "听音选词", "desc": "听发音选出单词 · 约 1 分钟", "icon": "ic-vol", "color": "#3B82F6"}, {"id": "D4-L2", "type": "match", "name": "词义配对", "desc": "英文和中文连起来 · 约 1 分钟", "icon": "ic-link", "color": "#8B5CF6"}, {"id": "D4-L3", "type": "spell", "name": "单词拼写", "desc": "每关 10 题 · 约 2 分钟", "icon": "ic-pen", "color": "#F59E0B"}, {"id": "D4-L4", "type": "pop", "name": "消消乐", "desc": "点掉配对的卡片 · 约 2 分钟", "icon": "ic-grid", "color": "#10B981"}, {"id": "D4-L5", "type": "quiz", "name": "闯关 PK", "desc": "综合大题冲刺三星 · 约 2 分钟", "icon": "ic-zap", "color": "#EC4899"}]}, {"id": "D5", "no": 5, "title": "School activities", "cn": "学校活动", "color": "#F59E0B", "pages": "p.50 – p.60", "words": [{"en": "drama", "ipa": "ˈdrɑːmə", "cn": "戏剧", "page": "", "core": false}, {"en": "trip", "ipa": "trɪp", "cn": "旅游；旅行，出行", "page": "", "core": false}, {"en": "fair", "ipa": "feə", "cn": "集市；义卖会；户外游艺会", "page": "", "core": false}, {"en": "festival", "ipa": "ˈfestɪvl", "cn": "节，节庆，汇演", "page": "", "core": false}, {"en": "horn", "ipa": "hɔːn", "cn": "角", "page": "", "core": false}, {"en": "dot", "ipa": "dɒt", "cn": "点，小圆点", "page": "", "core": false}, {"en": "raindrop", "ipa": "ˈreɪndrɒp", "cn": "雨点，雨滴", "page": "", "core": false}, {"en": "more", "ipa": "mɔː", "cn": "更多的", "page": "", "core": false}, {"en": "special", "ipa": "ˈspeʃl", "cn": "特殊的，特别的", "page": "", "core": false}, {"en": "keeper", "ipa": "ˈkiːpə", "cn": "看守人，保管人", "page": "", "core": false}, {"en": "hey", "ipa": "heɪ", "cn": "嘿，喂", "page": "", "core": false}, {"en": "lovely", "ipa": "ˈlʌvli", "cn": "美好的；令人愉快的；可爱的", "page": "", "core": true}, {"en": "student", "ipa": "ˈstjuːdnt", "cn": "学生", "page": "", "core": true}, {"en": "culture", "ipa": "ˈkʌltʃə", "cn": "文化", "page": "", "core": false}, {"en": "hour", "ipa": "ˈaʊə", "cn": "小时", "page": "", "core": false}, {"en": "note", "ipa": "nəʊt", "cn": "笔记，记录", "page": "", "core": false}, {"en": "vote", "ipa": "vəʊt", "cn": "选票", "page": "", "core": false}, {"en": "design", "ipa": "dɪˈzaɪn", "cn": "设计", "page": "", "core": false}, {"en": "hometown", "ipa": "ˈhəʊmtaʊn", "cn": "家乡，故乡", "page": "", "core": true}], "sentences": [{"en": "What is Daming doing?", "cn": "大明在做什么？", "page": ""}, {"en": "He's drawing.", "cn": "他在画画。", "page": ""}, {"en": "My favourite school activity is the Art Festival.", "cn": "我最喜欢的学校活动是艺术节。", "page": ""}], "levels": [{"id": "D5-L1", "type": "listen", "name": "听音选词", "desc": "听发音选出单词 · 约 1 分钟", "icon": "ic-vol", "color": "#3B82F6"}, {"id": "D5-L2", "type": "match", "name": "词义配对", "desc": "英文和中文连起来 · 约 1 分钟", "icon": "ic-link", "color": "#8B5CF6"}, {"id": "D5-L3", "type": "spell", "name": "单词拼写", "desc": "每关 10 题 · 约 2 分钟", "icon": "ic-pen", "color": "#F59E0B"}, {"id": "D5-L4", "type": "pop", "name": "消消乐", "desc": "点掉配对的卡片 · 约 2 分钟", "icon": "ic-grid", "color": "#10B981"}, {"id": "D5-L5", "type": "quiz", "name": "闯关 PK", "desc": "综合大题冲刺三星 · 约 2 分钟", "icon": "ic-zap", "color": "#EC4899"}]}, {"id": "D6", "no": 6, "title": "Cool clothes", "cn": "酷炫服装", "color": "#EF4444", "pages": "p.62 – p.74", "words": [{"en": "T-shirt", "ipa": "ˈtiːʃɜːt", "cn": "T恤（衫）", "page": "", "core": false}, {"en": "skirt", "ipa": "skɜːt", "cn": "半身裙，裙子", "page": "", "core": true}, {"en": "shorts", "ipa": "ʃɔːts", "cn": "短裤", "page": "", "core": true}, {"en": "shirt", "ipa": "ʃɜːt", "cn": "衬衫", "page": "", "core": true}, {"en": "trousers", "ipa": "ˈtraʊzəz", "cn": "裤子", "page": "", "core": true}, {"en": "scarf", "ipa": "skɑːf", "cn": "围巾", "page": "", "core": false}, {"en": "sweater", "ipa": "ˈswetə", "cn": "毛线衣，羊毛衫，针织衫", "page": "", "core": true}, {"en": "dress", "ipa": "dres", "cn": "连衣裙", "page": "", "core": true}, {"en": "party", "ipa": "ˈpɑːti", "cn": "聚会，宴会", "page": "", "core": true}, {"en": "dressmaker", "ipa": "ˈdresmeɪkə", "cn": "裁缝", "page": "", "core": false}, {"en": "wrong", "ipa": "rɒŋ", "cn": "不正确的，错误的", "page": "", "core": true}, {"en": "clever", "ipa": "ˈklevə", "cn": "聪明的", "page": "", "core": true}, {"en": "whale", "ipa": "weɪl", "cn": "鲸", "page": "", "core": false}, {"en": "Mr", "ipa": "ˈmɪstə", "cn": "先生", "page": "", "core": false}, {"en": "uniform", "ipa": "ˈjuːnɪfɔːm", "cn": "制服", "page": "", "core": false}, {"en": "robe", "ipa": "rəʊb", "cn": "长袍", "page": "", "core": false}], "sentences": [{"en": "What is he wearing?", "cn": "他穿着什么？", "page": ""}, {"en": "He's wearing a shirt and trousers.", "cn": "他穿着衬衫和裤子。", "page": ""}, {"en": "Is Amy wearing a skirt?", "cn": "埃米穿着裙子吗？", "page": ""}], "levels": [{"id": "D6-L1", "type": "listen", "name": "听音选词", "desc": "听发音选出单词 · 约 1 分钟", "icon": "ic-vol", "color": "#3B82F6"}, {"id": "D6-L2", "type": "match", "name": "词义配对", "desc": "英文和中文连起来 · 约 1 分钟", "icon": "ic-link", "color": "#8B5CF6"}, {"id": "D6-L3", "type": "spell", "name": "单词拼写", "desc": "每关 10 题 · 约 2 分钟", "icon": "ic-pen", "color": "#F59E0B"}, {"id": "D6-L4", "type": "pop", "name": "消消乐", "desc": "点掉配对的卡片 · 约 2 分钟", "icon": "ic-grid", "color": "#10B981"}, {"id": "D6-L5", "type": "quiz", "name": "闯关 PK", "desc": "综合大题冲刺三星 · 约 2 分钟", "icon": "ic-zap", "color": "#EC4899"}]}]}
 };
+var CURRICULUM = CURRICULA["上册"];
+var currentVolume = "上册";
+function switchVolume(vol) {
+  if (!CURRICULA[vol] || currentVolume === vol) return;
+  currentVolume = vol; CURRICULUM = CURRICULA[vol];
+  try { var bs = document.getElementById("brandSub"); if (bs) bs.textContent = CURRICULUM.book.replace(" · 英语", ""); } catch (e) { }
+  try { var as2 = document.getElementById("authSub"); if (as2) as2.textContent = CURRICULUM.book.replace(" · 英语", ""); } catch (e) { }
+  try { if (typeof switchView === "function") switchView("home"); } catch (e) { }
+  try { renderUnitMap(); } catch (e) { }
+  try { if (typeof renderHomeStats === "function") renderHomeStats(); } catch (e) { }
+  try {
+    var btns = document.querySelectorAll(".vol-btn");
+    for (var i = 0; i < btns.length; i++) {
+      var on = btns[i].getAttribute("data-vol") === vol;
+      btns[i].style.background = on ? "#2563EB" : "transparent";
+      btns[i].style.color = on ? "#fff" : "inherit";
+      btns[i].style.borderColor = on ? "#2563EB" : "rgba(37,99,235,.4)";
+    }
+  } catch (e) { }
+}
+document.addEventListener("click", function (e) {
+  var t = e.target;
+  while (t && t !== document) {
+    if (t.classList && t.classList.contains("vol-btn")) { switchVolume(t.getAttribute("data-vol")); return; }
+    t = t.parentNode;
+  }
+});
+;
 
 /* 宠物成长阶段（积分门槛，答案：答对 +10、通关 +20、三星 +15） */
 var PET_STAGES = [
@@ -2749,13 +2784,19 @@ function pickByMastery(pool, n) {
   return scored.slice(0, n).map(function (x) { return x.w; });
 }
 function findUnit(uid) {
-  for (var i = 0; i < CURRICULUM.units.length; i++) if (CURRICULUM.units[i].id === uid) return CURRICULUM.units[i];
+  for (var vol in CURRICULA) {
+    var us = CURRICULA[vol].units;
+    for (var i = 0; i < us.length; i++) if (us[i].id === uid) return us[i];
+  }
   return null;
 }
 function findLevel(lid) {
-  for (var i = 0; i < CURRICULUM.units.length; i++) {
-    var u = CURRICULUM.units[i];
-    for (var j = 0; j < u.levels.length; j++) if (u.levels[j].id === lid) return { unit: u, lv: u.levels[j], idx: j };
+  for (var vol in CURRICULA) {
+    var us = CURRICULA[vol].units;
+    for (var i = 0; i < us.length; i++) {
+      var u = us[i];
+      for (var j = 0; j < u.levels.length; j++) if (u.levels[j].id === lid) return { unit: u, lv: u.levels[j], idx: j };
+    }
   }
   return null;
 }
@@ -2767,13 +2808,13 @@ function allWords() {
 /* ------------------------- 2.8 账号层（多用户注册制） -------------------------
    账号表双写：本机 localStorage + 云端数据表（记录「存档名」= @index）
    每个用户的学习数据独立存放：「存档名」= @u:<用户名>
-   内置管理员 ZDL / 0130：可查看全部用户、重置密码、删除账号 */
+   内置管理员 ZDL / 123456：可查看全部用户、重置密码、删除账号 */
 var USERS_KEY = "wb_g4en_users_v1";
 var USERS_CLAIM = "wb_g4en_users_claimed";
 var SESSION_KEY = "wb_g4en_session_v1";
 var LEGACY_KEY = "wb_g4en_grade4_english_v1";
 var ADMIN_NAME = "ZDL";
-var ADMIN_INIT = { name: "ZDL", pwd: "0130", nick: "管理员", role: "admin", createdAt: "", lastLoginAt: "" };
+var ADMIN_INIT = { name: "ZDL", pwd: "123456", nick: "管理员", role: "admin", createdAt: "", lastLoginAt: "" };
 var NAME_RE = /^[A-Za-z0-9_\u4e00-\u9fa5]{2,12}$/;
 
 var users = [];
@@ -2792,6 +2833,9 @@ function loadUsers() {
   if (raw) { try { var p = JSON.parse(raw); if (Array.isArray(p)) users = p; } catch (e) { users = []; } }
   // 内置管理员始终在册（首次运行 / 账号表被清空时自动补回）
   if (!findUser(ADMIN_NAME)) users.unshift(clone(ADMIN_INIT));
+  // 初始密码迁移：旧版本内置密码 0130 的 ZDL 自动升级为 123456（管理员若已自行改过密码则不动）
+  var adminRec = findUser(ADMIN_NAME);
+  if (adminRec && String(adminRec.pwd) === "0130") { adminRec.pwd = ADMIN_INIT.pwd; }
   // 升级兼容：升级前的单用户数据留待首个账号继承
   try {
     if (!localStorage.getItem(USERS_CLAIM)) {
