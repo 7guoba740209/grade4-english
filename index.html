@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#3B82F6">
+<meta name="referrer" content="no-referrer">
 <title>四年级英语乐园 · 外研版</title>
 <!-- 本工作台通过 WorkBuddy 资料库能力（library skill）搭建、存储和部署 -->
 <style>
@@ -797,6 +798,14 @@ select.input{cursor:pointer}
   .wc-act{flex-direction:column;gap:5px}
   .hud-item.streak{display:none}
 }
+/* ===== 三科扩展：数学 / 语文 ===== */
+.big-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border:none;border-radius:16px;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08);font-family:inherit;box-sizing:border-box}
+.big-btn .ico{font-size:24px;flex:none}
+.big-btn small{display:block;font-weight:400;font-size:12px;opacity:.75;margin-top:2px}
+.bg-p{background:#EEF2FF;color:#3730A3}.bg-b{background:#ECFEFF;color:#155E75}
+.bg-c{background:#F0FDF4;color:#166534}.bg-o{background:#F8FAFC;color:#0F172A}
+.cn-p.now{background:#FEF9C3;border-radius:6px;box-shadow:0 0 0 6px #FEF9C3}
+.cn-s.now{background:#FDE047;border-radius:4px;padding:1px 2px}
 </style>
 </head>
 <body>
@@ -914,6 +923,13 @@ select.input{cursor:pointer}
   <main class="main">
     <!-- ===== 学习首页 ===== -->
     <section id="view-home" class="view active">
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-h"><h3>📚 三科学习</h3><span class="sub">语文 · 数学 · 英语</span></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-p" style="flex:1;padding:12px;font-size:16px" onclick="switchView('cn')">📖 语文</button>
+          <button class="btn btn-p" style="flex:1;padding:12px;font-size:16px;background:#0EA5E9" onclick="switchView('ma')">🧮 数学</button>
+        </div>
+      </div>
       <div class="today">
         <div class="today-h">
           <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
@@ -1062,6 +1078,8 @@ select.input{cursor:pointer}
         </div>
       </div>
     </section>
+    <section id="view-cn" class="view"><div id="cnBody"></div></section>
+    <section id="view-ma" class="view"><div id="maBody"></div></section>
   </main>
 </div>
 
@@ -4253,10 +4271,12 @@ function weekBarsSvg() {
 /* ===================== 10. 视图调度 ===================== */
 var TAB_OF = { home: "home", levels: "home", game: "home", book: "book", pet: "pet", wrong: "wrong", report: "report", parent: "parent" };
 function switchView(name) {
-  ["home", "levels", "game", "book", "pet", "wrong", "report", "parent"].forEach(function (v) {
+  ["home", "levels", "game", "book", "pet", "wrong", "report", "parent", "cn", "ma"].forEach(function (v) {
     var el = $("view-" + v);
     if (el) el.classList.toggle("active", v === name);
   });
+  if (window.CNMod) { if (name === "cn") CNMod.open(); else CNMod.stopAll(); }
+  if (window.MathMod && name === "ma") MathMod.open();
   var want = TAB_OF[name] || "home";
   var tabs = document.querySelectorAll("#mainTabs .tab");
   for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle("active", tabs[i].getAttribute("data-view") === want);
@@ -5314,5 +5334,12 @@ function init() {
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
 else init();
 </script>
+<script src="data/chinese-data.js"></script>
+<script src="data/full-4a.js"></script>
+<script src="data/full-4b.js"></script>
+<script src="data/essay-data.js"></script>
+<script src="data/math_bank.js"></script>
+<script src="js_cn.js"></script>
+<script src="js_math.js"></script>
 </body>
 </html>
