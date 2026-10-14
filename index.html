@@ -3683,6 +3683,91 @@ function toggleRecord(btn, onFinish) {
   }).catch(function () { toast("需要允许使用麦克风，才能跟读录音"); });
 }
 
+/* ------- 跟读评分：录音与内置标准音做离线声学对比 ------- */
+function prClamp01(x) { return Math.max(0, Math.min(1, x)); }
+function prPearson(a, b) {
+  var n = a.length, ma = 0, mb = 0, i;
+  for (i = 0; i < n; i++) { ma += a[i]; mb += b[i]; }
+  ma /= n; mb /= n;
+  var num = 0, da = 0, db = 0;
+  for (i = 0; i < n; i++) { var x = a[i] - ma, y = b[i] - mb; num += x * y; da += x * x; db += y * y; }
+  if (da <= 0 || db <= 0) return 0;
+  return num / Math.sqrt(da * db);
+}
+function prAudioFeat(url, ok, fail) {
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "arraybuffer";
+    xhr.onload = function () {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { fail(); return; }
+      var ac = new AC(), fin = false;
+      ac.decodeAudioData(xhr.response, function (ab) {
+        if (fin) return; fin = true;
+        try { if (ac.close) ac.close(); } catch (e) { }
+        var n = ab.length, ch = ab.numberOfChannels, i, c;
+        var mono = new Float32Array(n);
+        for (i = 0; i < n; i++) { var s = 0; for (c = 0; c < ch; c++) s += ab.getChannelData(c)[i]; mono[i] = s / ch; }
+        ok({ sr: ab.sampleRate, mono: mono });
+      }, function () { if (fin) return; fin = true; fail(); });
+    };
+    xhr.onerror = function () { fail(); };
+    xhr.send();
+  } catch (e) { fail(); }
+}
+function prTrim(mono, sr) {                      // 剪掉首尾静音，返回 [start, end)
+  var fr = Math.round(sr * 0.02), thr = 0.015, start = 0, end = mono.length, i, j, e;
+  for (i = 0; i + fr < mono.length; i += fr) {
+    e = 0; for (j = 0; j < fr; j++) e += mono[i + j] * mono[i + j];
+    if (Math.sqrt(e / fr) > thr) { start = i; break; }
+  }
+  for (i = mono.length - fr; i > start; i -= fr) {
+    e = 0; for (j = 0; j < fr; j++) e += mono[i + j] * mono[i + j];
+    if (Math.sqrt(e / fr) > thr) { end = i + fr; break; }
+  }
+  if (end <= start) end = Math.min(mono.length, start + fr);
+  return [start, end];
+}
+function prCurves(mono, s0, e0, sr, N) {         // 均匀取 N 帧的能量包络 + 过零率曲线
+  var total = e0 - s0, fr = Math.max(Math.round(sr * 0.02), Math.floor(total / N) || 1);
+  var hop = Math.max(1, Math.floor(Math.max(1, total - fr) / (N - 1)));
+  var env = [], zcr = [], k, j;
+  for (k = 0; k < N; k++) {
+    var st = k * hop; if (st + fr > total) st = Math.max(0, total - fr);
+    var e = 0, z = 0;
+    for (j = 0; j < fr; j++) {
+      var v = mono[s0 + st + j], pv = j ? mono[s0 + st + j - 1] : v;
+      e += v * v;
+      if ((v < 0 && pv >= 0) || (v >= 0 && pv < 0)) z++;
+    }
+    env.push(Math.sqrt(e / fr)); zcr.push(z / fr);
+  }
+  return { env: env, zcr: zcr };
+}
+function scorePronun(refUrl, userUrl, cb) {      // cb({score}) 或 cb(null)
+  var ref = null, usr = null, failed = 0, done = false;
+  function step() {
+    if (done || !ref || !usr) return;
+    done = true;
+    try {
+      var rt = prTrim(ref.mono, ref.sr), ut = prTrim(usr.mono, usr.sr);
+      var N = 48;
+      var R = prCurves(ref.mono, rt[0], rt[1], ref.sr, N);
+      var U = prCurves(usr.mono, ut[0], ut[1], usr.sr, N);
+      var rEnv = prClamp01(prPearson(R.env, U.env));
+      var rZcr = prClamp01(prPearson(R.zcr, U.zcr));
+      var rd = (rt[1] - rt[0]) / ref.sr, ud = (ut[1] - ut[0]) / usr.sr;
+      var durS = prClamp01(1 - Math.abs(Math.log(ud && rd ? ud / rd : 1)) / 1.2);
+      var sc = Math.round(100 * (0.5 * rEnv + 0.3 * rZcr + 0.2 * durS));
+      cb({ score: Math.max(30, Math.min(99, sc)) });
+    } catch (e) { cb(null); }
+  }
+  prAudioFeat(refUrl, function (f) { ref = f; step(); }, function () { failed++; if (failed >= 2 && !done) { done = true; cb(null); } });
+  prAudioFeat(userUrl, function (f) { usr = f; step(); }, function () { failed++; if (failed >= 2 && !done) { done = true; cb(null); } });
+  setTimeout(function () { if (!done) { done = true; cb(null); } }, 9000);
+}
+
 /* ------------------------- 7. 通用界面反馈 ------------------------- */
 var fbTimer = null;
 function fb(ok, text) {
@@ -3943,7 +4028,7 @@ function renderBook() {
           + '<div class="wc-cn">' + esc(w.cn) + "</div></div>"
           + '<div class="wc-act">'
           + '<button class="icon-btn" data-say="' + esc(w.en) + '" title="朗读"><svg><use href="#ic-vol"/></svg></button>'
-          + '<button class="icon-btn" data-rec="' + i + '" title="跟读录音"><svg><use href="#ic-mic"/></svg></button>'
+          + '<button class="icon-btn" data-rec="' + i + '" data-text="' + esc(w.en) + '" title="跟读录音"><svg><use href="#ic-mic"/></svg></button>'
           + "</div></div>";
       }).join("");
     return;
@@ -5115,13 +5200,41 @@ function bindEvents() {
     var rec = closestAttr(e.target, "data-rec");
     if (rec) {
       var btn = rec;
+      var word = rec.getAttribute("data-text") || "";
+      if (!btn.classList.contains("rec")) stopSpeech();     // 录音前先停掉标准音，避免收进杂音
       toggleRecord(btn, function (url) {
-        var a = new Audio(url);
-        a.play();
-        showModal("<h3>听听你读的</h3><div class=\"m-body\">和标准读音对比一下，再读一遍会更准。</div>"
-          + '<div class="modal-act"><button class="btn btn-p" id="mReplay">再听一次</button><button class="btn btn-o" id="mClose2">知道了</button></div>');
-        $("mReplay").onclick = function () { a.currentTime = 0; a.play(); };
+        var ua = new Audio(url);
+        var refUrl = word ? audioUrlFor(word) : null;
+        showModal('<h3>跟读评分</h3><div class="m-body" id="recScoreBody"><p class="sub">正在给你的发音打分…</p></div>'
+          + '<div class="modal-act"><button class="btn btn-o" id="mClose2">关闭</button></div>');
         $("mClose2").onclick = closeModal;
+        function renderScore(r) {
+          var body = $("recScoreBody");
+          if (!body) return;
+          if (!r) {
+            body.innerHTML = '<p class="sub">这个浏览器算不了分，不过录音在这里——和标准音对比着听。</p>'
+              + '<p style="margin:10px 0 0"><button class="btn btn-o" id="mPlayMe">听我的录音</button>'
+              + (refUrl ? ' <button class="btn btn-p" id="mPlayRef">听标准音</button>' : "") + "</p>";
+          } else {
+            var stars = r.score >= 85 ? 3 : r.score >= 70 ? 2 : r.score >= 55 ? 1 : 0;
+            var starStr = "";
+            for (var si = 0; si < 3; si++) starStr += si < stars ? "★" : "☆";
+            var col = stars >= 2 ? "#16A34A" : stars === 1 ? "#D97706" : "#DC2626";
+            var msg = stars === 3 ? "太棒了！和标准音几乎一样"
+              : stars === 2 ? "读得很不错，再跟一遍会更流利"
+              : stars === 1 ? "有进步！先听标准音，再慢慢跟读"
+              : "再来一次：点「听标准音」，一个音一个音地跟着读";
+            body.innerHTML = '<div style="text-align:center;margin:4px 0 2px">'
+              + '<div style="font-size:46px;font-weight:800;color:' + col + '">' + r.score + "</div>"
+              + '<div style="font-size:22px;color:#F59E0B;letter-spacing:4px">' + starStr + "</div>"
+              + '<p style="margin:8px 0 0">' + msg + "</p></div>"
+              + '<p style="margin:12px 0 0;text-align:center"><button class="btn btn-p" id="mPlayRef">🔊 听标准音</button> <button class="btn btn-o" id="mPlayMe">🎤 听我的录音</button></p>';
+          }
+          var pr = $("mPlayRef"); if (pr) pr.onclick = function () { speak(word); };
+          var pm = $("mPlayMe"); if (pm) pm.onclick = function () { ua.currentTime = 0; ua.play(); };
+        }
+        if (refUrl) scorePronun(refUrl, url, renderScore);
+        else setTimeout(function () { renderScore(null); }, 200);
       });
       toast(btn.classList.contains("rec") ? "正在录音，再点一下就停止" : "");
     }
