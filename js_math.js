@@ -1,8 +1,9 @@
 /* ============================================================
  *  数学模块（移植自 kidlearn，适配主平台）
- *  ① 每日口算打卡：10 题选择题 · 计时 · 自动评级
+ *  ① 每日口算打卡：10 题 · 数字键盘输答案 · 计时 · 自动评级
  *  ② 拍错题：拍照/相册 → 拖框选一题 → Tesseract 本地 OCR → 知识点匹配
- *     → 从真题库(MATH_BANK)抽 3 道同类选择题 → 判分解析（题目非自编）
+ *     → 从真题库(MATH_BANK)抽 3 道同类题：答案为数字 → 键盘输入；文字答案 → 点选
+ *     （布局：题目和输入框在上方，照片缩小置底，不被键盘压住）
  *  ③ 错题本：按键查看所有拍过的错题，可重练、可删除
  *  数据依赖：data/math_bank.js (MATH_KPS / MATH_BANK)；vendor/tesseract/* 按需加载
  * ============================================================ */
@@ -288,32 +289,28 @@ window.MathMod = (function () {
     var idx = shuffle(bank.map(function (_, i) { return i; })).slice(0, Math.min(n, bank.length));
     return idx.map(function (i) { return bank[i]; });
   }
-
-  /* ---------- 每日口算（10 题选择题 · 计时 · 评级） ---------- */
-  function swapDigits(n) {
-    if (n < 10) return n;
-    var u = n % 10, t = Math.floor(n / 10) % 10, rest = Math.floor(n / 100);
-    return rest * 100 + u * 10 + t;
+  /* 题库答案是否纯数字：数字 → 键盘输入；文字（如“平行四边形”）→ 保留点选 */
+  function isNumAns(q) { return q && q.opts && /^-?\d+(\.\d+)?$/.test(String(q.opts[q.ans]).trim()); }
+  /* 旧版记录 picks 存的是选项下标，统一重置为未答，避免新旧混用出错 */
+  function normSess(s) {
+    if (s && s.picks && s.picks.length && typeof s.picks[0] === 'number') {
+      s.picks = s.picks.map(function () { return ''; });
+      s.done = false; s.got = 0; saveSess(s);
+    }
+    return s;
   }
+
+  /* ---------- 每日口算（10 题 · 键盘输答案 · 计时 · 评级） ---------- */
   function makeAdd() { var a = rnd(100, 999), b = rnd(10, 99); return { q: a + ' + ' + b, a: a + b }; }
   function makeSub() { var a = rnd(100, 999), b = rnd(10, 99); return { q: a + ' − ' + b, a: a - b }; }
   function makeMul() { var a = rnd(10, 99), b = rnd(2, 9); return { q: a + ' × ' + b, a: a * b }; }
   function makeDiv() { var d = rnd(2, 9), q2 = rnd(3, 9); return { q: (d * q2) + ' ÷ ' + d, a: q2 }; }
-  function makeOptions(ans) {
-    var cands = [ans + 1, ans - 1, ans + 10, ans - 10, ans + 2, ans - 2, swapDigits(ans), ans + 5, ans - 5, ans + 20];
-    var pool = [];
-    cands.forEach(function (c) { if (c >= 0 && c !== ans && pool.indexOf(c) < 0) pool.push(c); });
-    while (pool.length < 3) { var x = ans + rnd(1, 30); if (x !== ans && pool.indexOf(x) < 0) pool.push(x); }
-    var opts = shuffle(pool).slice(0, 3);
-    opts.push(ans);
-    return shuffle(opts);
-  }
   function buildQuiz() {
     var makers = [makeAdd, makeSub, makeMul, makeDiv];
     var qs = makers.map(function (m) { return m(); });
     for (var i = qs.length; i < 10; i++) qs.push(makers[rnd(0, 3)]());
     shuffle(qs);
-    qs.forEach(function (q, i) { q.no = i + 1; q.opts = makeOptions(q.a); });
+    qs.forEach(function (q, i) { q.no = i + 1; });
     return qs;
   }
   function ratingOf(right, total) {
@@ -334,6 +331,58 @@ window.MathMod = (function () {
   }
   var _quiz = null, _quizTimer = null, _quizStart = 0;
 
+  /* ---------- 自绘数字键盘（不弹系统输入法，题目/输入框不会被遮挡） ----------
+   * makePad(mount, limit, onOk) → { get, lock, mark }
+   *   mount  挂载容器；limit 最大位数；onOk(val) 点“确定”时回调，回调里调 pad.lock()/mark()
+   */
+  function makePad(mount, limit, onOk) {
+    var val = '';
+    var h = '<div class="padDisp" style="height:54px;border:2.5px solid #1D4ED8;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#94A3B8;background:#F8FAFC;margin-bottom:8px;letter-spacing:2px">点下方键盘输入答案</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;max-width:360px;margin:0 auto">';
+    var KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '确'];
+    KEYS.forEach(function (k) {
+      var bg = '#fff', fg = '#1E293B', bd = '#e2e8f0', fs = 24;
+      if (k === '⌫') { bg = '#FEF3C7'; fg = '#B45309'; bd = '#FDE68A'; fs = 22; }
+      if (k === '确') { bg = '#1D4ED8'; fg = '#fff'; bd = '#1D4ED8'; fs = 22; }
+      h += '<button class="pad-k" data-k="' + k + '" style="font-size:' + fs + 'px;font-weight:800;padding:13px 0;border-radius:12px;border:1.5px solid ' + bd + ';background:' + bg + ';color:' + fg + ';box-shadow:0 1px 2px rgba(15,23,42,.08)">' + k + '</button>';
+    });
+    h += '</div>';
+    mount.innerHTML = h;
+    var disp = mount.querySelector('.padDisp');
+    var btns = mount.querySelectorAll('.pad-k');
+    var locked = false;
+    function draw() {
+      disp.textContent = val === '' ? '点下方键盘输入答案' : val;
+      disp.style.color = val === '' ? '#94A3B8' : '#1E293B';
+    }
+    function lock() { locked = true; for (var i = 0; i < btns.length; i++) { btns[i].disabled = true; btns[i].style.opacity = 0.55; } }
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].onclick = (function (b) {
+        return function () {
+          if (locked) return;
+          var k = b.getAttribute('data-k');
+          if (k === '确') {
+            if (val === '') { toast('先输入答案哦'); return; }
+            onOk(val); return;
+          }
+          if (k === '⌫') { val = val.slice(0, -1); }
+          else if (val.length < limit) { val += k; }
+          draw();
+        };
+      })(btns[i]);
+    }
+    draw();
+    return {
+      get: function () { return val; },
+      lock: lock,
+      mark: function (ok, note) {
+        disp.style.borderColor = ok ? '#16A34A' : '#DC2626';
+        disp.style.color = ok ? '#16A34A' : '#DC2626';
+        disp.textContent = (val || '') + (note ? '　' + note : '');
+      }
+    };
+  }
+
   /* ---------- 路由与渲染 ---------- */
   var maRoute = { page: 'home' };
   function el(id) { return document.getElementById(id); }
@@ -346,7 +395,7 @@ window.MathMod = (function () {
       + '<button class="icon-btn" data-ma-go="backHome" title="返回">‹ 返回</button><h2 style="margin:0">🧮 数学</h2></div>'
       + '<p class="sub" style="margin-bottom:14px">今天先来练一练！口算热热身，或把错题拍下来针对性练。</p>'
       + '<button class="big-btn bg-p" data-ma-go="quiz" style="width:100%;margin-bottom:10px"><span class="ico">📝</span>'
-      + '<span>每日口算打卡<small>10 道选择题 · 计时 · 自动评级' + (best ? ' · 今日最佳 ' + best.right + '/10' : '') + '</small></span></button>'
+      + '<span>每日口算打卡<small>10 道口算 · 键盘输答案 · 计时评级' + (best ? ' · 今日最佳 ' + best.right + '/10' : '') + '</small></span></button>'
       + '<div style="display:flex;gap:10px;margin-bottom:10px">'
       + '<button class="big-btn bg-b" id="maCam" style="flex:1"><span class="ico">📷</span><span>拍照错题<small>打开相机</small></span></button>'
       + '<button class="big-btn bg-c" id="maAlbum2" style="flex:1"><span class="ico">🖼️</span><span>相册选图<small>或选电脑截图</small></span></button></div>'
@@ -357,7 +406,7 @@ window.MathMod = (function () {
       + '<div class="card"><div style="font-weight:800;margin-bottom:6px">怎么用？</div>'
       + '<div style="color:#475569;font-size:15px;line-height:1.9">① 拍下或选一张错题照片<br>'
       + '② <b>拖动四角，只框住这一道题</b>（一张照片有多题时尤其有用）<br>'
-      + '③ 自动识别知识点（认不出会请你选），从<b>真题库</b>抽 3 道同类选择题<br>'
+      + '③ 自动识别知识点（认不出会请你选），从<b>真题库</b>抽 3 道同类题（计算题键盘输答案，概念题点选）<br>'
       + '④ 做完自动判分，每题都有解析和出处；错题自动存进错题本<br>'
       + '<span style="font-size:13px">照片只存在本机浏览器里，首次识别需下载约 20MB 识别包（之后离线可用）</span></div></div>';
     var fi = el('maFile');
@@ -420,7 +469,7 @@ window.MathMod = (function () {
     var s = {
       id: 's' + Date.now(), kp: kpId, kpName: kp.name, emoji: kp.emoji, color: kp.color,
       ocr: ocrTxt || '', photo: photo || '', time: nowStr(),
-      qs: qs, picks: [-1, -1, -1], done: false, got: 0
+      qs: qs, picks: ['', '', ''], done: false, got: 0
     };
     saveSess(s);
     maRoute = { page: 'sess', id: s.id };
@@ -433,7 +482,7 @@ window.MathMod = (function () {
     var best = xget('quiz_best_' + dayKey(), null);
     var h = '<div class="page-head" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
       + '<button class="icon-btn" data-ma-go="home" title="返回">‹ 返回</button><h2 style="margin:0">📝 每日口算打卡</h2></div>'
-      + '<p class="sub" style="margin-bottom:10px">10 道选择题，计时开始！' + (best ? '今日最佳：' + best.right + '/10 · ' + best.rating : '') + '</p>'
+      + '<p class="sub" style="margin-bottom:10px">10 道口算直接输答案，计时开始！' + (best ? '今日最佳：' + best.right + '/10 · ' + best.rating : '') + '</p>'
       + '<div class="card" id="quizCard"></div>'
       + '<div style="text-align:center;margin-top:10px;font-size:14px;color:#475569">⏱ <span id="quizTime">00:00</span></div>';
     box.innerHTML = h;
@@ -451,27 +500,19 @@ window.MathMod = (function () {
     if (!card) return;
     if (i >= _quiz.length) { quizDone(right); return; }
     var q = _quiz[i];
-    var h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    window.scrollTo(0, 0);   /* 换题回到顶部：题目和输入框始终在最上面，键盘不压住 */
+    var h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
       + '<b>第 ' + (i + 1) + ' / ' + _quiz.length + ' 题</b><span class="chip" style="background:#DBEAFE;color:#1D4ED8">已对 ' + right + '</span></div>'
-      + '<div style="font-size:30px;font-weight:800;text-align:center;margin:16px 0">' + esc(q.q) + ' = ?</div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-    q.opts.forEach(function (o, oi) {
-      h += '<button class="btn btn-o" data-quiz-opt="' + oi + '" style="font-size:22px;font-weight:700;padding:14px">' + o + '</button>';
-    });
-    h += '</div>';
+      + '<div style="font-size:34px;font-weight:800;text-align:center;margin:6px 0 12px">' + esc(q.q) + ' =</div>'
+      + '<div id="quizPad"></div>';
     card.innerHTML = h;
-    var btns = card.querySelectorAll('[data-quiz-opt]');
-    for (var b = 0; b < btns.length; b++) {
-      btns[b].onclick = (function (bi) {
-        return function () {
-          var ok = _quiz[i].opts[bi] === _quiz[i].a;
-          btns[bi].style.background = ok ? '#DCFCE7' : '#FEE2E2';
-          btns[bi].style.borderColor = ok ? '#16A34A' : '#DC2626';
-          if (window.sfxTap) sfxTap(); else if (ok && window.sfxRight) sfxRight();
-          setTimeout(function () { renderQuizQ(i + 1, right + (ok ? 1 : 0)); }, 420);
-        };
-      })(b);
-    }
+    var pad = makePad(el('quizPad'), 6, function (v) {
+      var ok = Number(v) === q.a;
+      pad.lock();
+      pad.mark(ok, ok ? '✔ 答对了' : '✘ 正确答案 ' + q.a);
+      if (window.sfxTap) sfxTap(); else if (ok && window.sfxRight) sfxRight();
+      setTimeout(function () { renderQuizQ(i + 1, right + (ok ? 1 : 0)); }, 650);
+    });
   }
   function quizDone(right) {
     clearInterval(_quizTimer);
@@ -523,38 +564,64 @@ window.MathMod = (function () {
   }
 
   function renderSess(box, id) {
-    var s = getSess(id);
+    var s = normSess(getSess(id));
     if (!s) { box.innerHTML = '<div class="card" style="text-align:center">这条错题记录不见了</div>'; return; }
     var qi = 0;
-    while (qi < s.qs.length && s.picks[qi] >= 0) qi++;
+    while (qi < s.qs.length && s.picks[qi] !== '') qi++;
     var h = '<div class="page-head" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
       + '<button class="icon-btn" data-ma-go="album" title="返回">‹ 返回</button>'
       + '<h2 style="margin:0">' + s.emoji + ' ' + esc(s.kpName) + '</h2></div>'
-      + '<p class="sub" style="margin-bottom:8px">' + esc(s.time) + '</p>'
-      + (s.photo ? '<img src="' + s.photo + '" style="width:100%;max-height:200px;object-fit:cover;border-radius:14px;margin-bottom:10px">' : '');
+      + '<p class="sub" style="margin-bottom:8px">' + esc(s.time) + '</p>';
     if (!s.done) {
+      /* 题目和输入框上移：紧跟页头，照片缩小放到键盘下方，避免被数字键盘压住 */
       var q = s.qs[qi];
-      h += '<div class="card"><div style="font-weight:800;margin-bottom:6px">同类真题 第 ' + (qi + 1) + ' / ' + s.qs.length + ' 题</div>'
-        + '<div style="font-size:17px;line-height:1.8;margin-bottom:12px">' + esc(q.q) + '</div>';
-      var LABELS = ['A', 'B', 'C', 'D'];
-      q.opts.forEach(function (o, oi) {
-        h += '<button class="btn btn-o" data-ma-opt="' + oi + '" style="display:block;width:100%;text-align:left;margin-bottom:8px"><b>' + LABELS[oi] + '.</b> ' + esc(o) + '</button>';
-      });
+      h += '<div class="card" style="margin-bottom:10px"><div style="font-weight:800;margin-bottom:2px">同类真题 第 ' + (qi + 1) + ' / ' + s.qs.length + ' 题</div>'
+        + '<div style="font-size:19px;line-height:1.7;margin:6px 0 12px">' + esc(q.q) + '</div>';
+      if (isNumAns(q)) {
+        h += '<div id="maPad"></div>';
+      } else {
+        var LABELS = ['A', 'B', 'C', 'D'];
+        q.opts.forEach(function (o, oi) {
+          h += '<button class="btn btn-o" data-ma-opt="' + oi + '" style="display:block;width:100%;text-align:left;margin-bottom:8px"><b>' + LABELS[oi] + '.</b> ' + esc(o) + '</button>';
+        });
+      }
       h += '</div><div id="maExp"></div>';
+      h += s.photo ? '<div class="card" style="margin-top:10px"><div style="font-weight:800;margin-bottom:4px">📷 拍的这道题（点图放大）</div>'
+        + '<img src="' + s.photo + '" id="maPhoto" style="width:100%;max-height:110px;object-fit:cover;object-position:top;border-radius:10px;cursor:pointer"></div>' : '';
     } else {
+      h += s.photo ? '<img src="' + s.photo + '" style="width:100%;max-height:200px;object-fit:cover;border-radius:14px;margin-bottom:10px">' : '';
       h += sessResultHtml(s);
     }
-    h += '<div class="card" style="margin-top:10px"><div style="font-weight:800;margin-bottom:4px">📷 拍的这道题</div>'
+    h += '<div class="card" style="margin-top:10px"><div style="font-weight:800;margin-bottom:4px">📝 识别出的题目文字（可改）</div>'
       + '<textarea rows="2" style="width:100%;box-sizing:border-box;font-size:14px;padding:8px;border-radius:10px;border:1.5px solid #d9e2ec;font-family:inherit" placeholder="识别出的题目文字（可改）">' + esc(s.ocr || '') + '</textarea>'
       + '<div style="display:flex;gap:8px;margin-top:8px">'
       + '<button class="btn btn-o" data-ma-go="repractice" style="flex:1">再练 3 题</button>'
       + '<button class="btn btn-o" data-ma-go="delsess" style="flex:1;color:#DC2626">删除这条</button></div></div>';
     box.innerHTML = h;
 
+    /* 点小图放大查看 */
+    var ph = el('maPhoto');
+    if (ph) {
+      ph.onclick = function () {
+        var ov = document.createElement('div');
+        ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.92);display:flex;align-items:center;justify-content:center;padding:12px;cursor:zoom-out';
+        var im = new Image(); im.src = s.photo;
+        im.style.cssText = 'max-width:100%;max-height:100%;border-radius:8px';
+        ov.appendChild(im);
+        ov.onclick = function () { document.body.removeChild(ov); };
+        document.body.appendChild(ov);
+      };
+    }
+
     if (!s.done) {
+      if (isNumAns(s.qs[qi])) {
+        makePad(el('maPad'), 12, function (v) {
+          answerSess(box, id, qi, v);
+        });
+      }
       var btns = box.querySelectorAll('[data-ma-opt]');
       for (var i = 0; i < btns.length; i++) {
-        btns[i].onclick = (function (bi) { return function () { answerSess(box, id, qi, bi); }; })(i);
+        btns[i].onclick = (function (bi) { return function () { answerSess(box, id, qi, s.qs[qi].opts[bi]); }; })(i);
       }
     }
   }
@@ -565,26 +632,44 @@ window.MathMod = (function () {
       + '<div style="color:#475569;font-size:14px">' + (s.got === s.qs.length ? '全对！这个知识点过关了' : '错题解析都在下面，再看一遍就懂了') + '</div></div>'
       + '<div class="card" style="margin-top:10px"><div style="font-weight:800;margin-bottom:8px">逐题回顾</div>'
       + s.qs.map(function (q, i) {
-        var ok = s.picks[i] === q.ans;
+        var ans = String(q.opts[q.ans]).trim();
+        var ok = s.picks[i] === ans;
         return '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #e2e8f0">'
           + '<div style="font-size:15px;line-height:1.7"><b>' + (i + 1) + '.</b> ' + esc(q.q) + '</div>'
-          + '<div style="font-size:14px;margin-top:2px;color:' + (ok ? '#16A34A' : '#DC2626') + '">你选了 ' + (s.picks[i] >= 0 ? esc(q.opts[s.picks[i]]) : '（未答）') + (ok ? ' ✔' : '，正确答案是 ' + esc(q.opts[q.ans])) + '</div>'
+          + '<div style="font-size:14px;margin-top:2px;color:' + (ok ? '#16A34A' : '#DC2626') + '">你答了 ' + (s.picks[i] ? esc(s.picks[i]) : '（未答）') + (ok ? ' ✔' : '，正确答案是 ' + esc(ans)) + '</div>'
           + '<div style="font-size:13px;color:#475569;margin-top:2px">💡 ' + esc(q.exp) + '</div>'
           + '<div style="font-size:12px;color:#94A3B8;margin-top:2px">出处：' + esc(q.src) + '</div></div>';
       }).join('') + '</div>';
   }
-  function answerSess(box, id, qi, opt) {
+  function answerSess(box, id, qi, pickedText) {
     var s = getSess(id);
-    if (!s) return;
-    s.picks[qi] = opt;
-    var ok = s.qs[qi].opts[opt] === s.qs[qi].ans;
+    if (!s || s.picks[qi] !== '') return;
+    var q = s.qs[qi];
+    var ans = String(q.opts[q.ans]).trim();
+    var typed = String(pickedText).trim();
+    s.picks[qi] = typed;
+    var ok = typed === ans;
     if (ok) s.got++;
+    /* 输入题：键盘变色锁定；点选题：按钮变灰锁定 */
+    var padDisp = box.querySelector('.padDisp');
+    if (padDisp && isNumAns(q)) {
+      padDisp.style.borderColor = ok ? '#16A34A' : '#DC2626';
+      padDisp.style.color = ok ? '#16A34A' : '#DC2626';
+      padDisp.textContent = typed + (ok ? '　✔ 答对了' : '　✘ 正确答案 ' + ans);
+    }
+    var pks = box.querySelectorAll('.pad-k');
+    for (var p = 0; p < pks.length; p++) { pks[p].disabled = true; pks[p].style.opacity = 0.55; }
+    var optBtns = box.querySelectorAll('[data-ma-opt]');
+    for (var i2 = 0; i2 < optBtns.length; i2++) {
+      optBtns[i2].disabled = true; optBtns[i2].style.opacity = 0.6;
+      if (optBtns[i2].textContent.indexOf(typed) >= 0 && ok) { optBtns[i2].style.opacity = 1; optBtns[i2].style.background = '#DCFCE7'; }
+    }
     var expBox = el('maExp');
     if (expBox) {
       expBox.innerHTML = '<div class="card" style="border:2px solid ' + (ok ? '#16A34A' : '#DC2626') + '">'
-        + '<div style="font-weight:800;color:' + (ok ? '#16A34A' : '#DC2626') + '">' + (ok ? '答对了！' : '答错了，正确答案是 ' + esc(s.qs[qi].opts[s.qs[qi].ans])) + '</div>'
-        + '<div style="font-size:14px;color:#334155;margin-top:4px">💡 ' + esc(s.qs[qi].exp) + '</div>'
-        + '<div style="font-size:12px;color:#94A3B8;margin-top:2px">出处：' + esc(s.qs[qi].src) + '</div>'
+        + '<div style="font-weight:800;color:' + (ok ? '#16A34A' : '#DC2626') + '">' + (ok ? '答对了！' : '答错了，正确答案是 ' + esc(ans)) + '</div>'
+        + '<div style="font-size:14px;color:#334155;margin-top:4px">💡 ' + esc(q.exp) + '</div>'
+        + '<div style="font-size:12px;color:#94A3B8;margin-top:2px">出处：' + esc(q.src) + '</div>'
         + '<button class="btn btn-p" data-ma-go="nextq" style="margin-top:8px">' + (qi + 1 < s.qs.length ? '下一题' : '看结果') + '</button></div>';
       var nb = expBox.querySelector('[data-ma-go="nextq"]');
       if (nb) nb.onclick = function () {
@@ -593,10 +678,6 @@ window.MathMod = (function () {
         renderSess(box, id);
       };
     }
-    /* 锁住选项，防止重复点 */
-    var btns = box.querySelectorAll('[data-ma-opt]');
-    for (var i = 0; i < btns.length; i++) { btns[i].disabled = true; btns[i].style.opacity = 0.6; }
-    if (ok) { btns[opt].style.opacity = 1; btns[opt].style.background = '#DCFCE7'; }
     saveSess(s);
   }
 
@@ -624,7 +705,7 @@ window.MathMod = (function () {
     if (v === 'repractice') {
       var s = getSess(maRoute.id);
       if (s) {
-        s.qs = pickRealQuestions(s.kp, 3); s.picks = [-1, -1, -1]; s.done = false; s.got = 0;
+        s.qs = pickRealQuestions(s.kp, 3); s.picks = ['', '', '']; s.done = false; s.got = 0;
         saveSess(s); renderSess(box, s.id);
       }
       return;
